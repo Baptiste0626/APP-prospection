@@ -1,0 +1,2027 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prospection cabinets médicaux</title>
+<meta name="description" content="Outil de prospection téléphonique des cabinets médicaux : script, objections, calculateur de gains, pipeline et relances.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a6fc9'/%3E%3Cpath d='M16 8v16M8 16h16' stroke='white' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f7f7f5; --surface:#ffffff; --surface-2:#f2f2ef; --surface-3:#e9e9e5;
+  --border:#e4e3df; --border-strong:#d2d1cb;
+  --text:#18181b; --text-2:#52514e; --text-3:#8a8984;
+  --accent:#2a6fc9; --accent-hover:#225db0; --accent-soft:#e8f0fb; --accent-text:#1d5aa8;
+  --series-1:#2a78d6; --series-2:#eb6834;
+  --danger:#c2410c; --danger-soft:#fdf0e9; --ok:#15803d; --ok-soft:#eaf6ee; --warn:#a16207; --warn-soft:#fbf4e2;
+  --shadow:0 1px 2px rgba(20,20,20,.04),0 4px 16px rgba(20,20,20,.05);
+  --shadow-lg:0 10px 40px rgba(20,20,20,.16);
+  --radius:10px; --radius-sm:7px;
+  /* statuts */
+  --st-nouveau:#8a8984; --st-nouveau-bg:#f0f0ed;
+  --st-a_rappeler:#b45309; --st-a_rappeler-bg:#fbf3e4;
+  --st-contacte:#2563b8; --st-contacte-bg:#eaf1fb;
+  --st-interesse:#7c3aed; --st-interesse-bg:#f3eefd;
+  --st-demo:#0f7d76; --st-demo-bg:#e6f5f3;
+  --st-proposition:#4338ca; --st-proposition-bg:#eeeefb;
+  --st-signe:#15803d; --st-signe-bg:#e9f6ed;
+  --st-perdu:#b4383f; --st-perdu-bg:#fbeced;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#121212; --surface:#1a1a19; --surface-2:#222221; --surface-3:#2b2b29;
+    --border:#2c2c2a; --border-strong:#3a3a37;
+    --text:#f0efec; --text-2:#c3c2b7; --text-3:#8d8c85;
+    --accent:#4a8fe6; --accent-hover:#6aa3ec; --accent-soft:#1c2a3d; --accent-text:#8bb8f2;
+    --series-1:#3987e5; --series-2:#d95926;
+    --danger:#f08a5d; --danger-soft:#33221a; --ok:#5fc27e; --ok-soft:#18291e; --warn:#e0b04a; --warn-soft:#2e2715;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+    --shadow-lg:0 10px 40px rgba(0,0,0,.5);
+    --st-nouveau:#a3a29c; --st-nouveau-bg:#262624;
+    --st-a_rappeler:#e5a54b; --st-a_rappeler-bg:#2f2617;
+    --st-contacte:#6ea4ec; --st-contacte-bg:#1b2738;
+    --st-interesse:#ad8cf5; --st-interesse-bg:#272038;
+    --st-demo:#4cc0b4; --st-demo-bg:#152c2a;
+    --st-proposition:#8f8cf0; --st-proposition-bg:#212038;
+    --st-signe:#5fc27e; --st-signe-bg:#18291e;
+    --st-perdu:#ec7d84; --st-perdu-bg:#331c1e;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#121212; --surface:#1a1a19; --surface-2:#222221; --surface-3:#2b2b29;
+  --border:#2c2c2a; --border-strong:#3a3a37;
+  --text:#f0efec; --text-2:#c3c2b7; --text-3:#8d8c85;
+  --accent:#4a8fe6; --accent-hover:#6aa3ec; --accent-soft:#1c2a3d; --accent-text:#8bb8f2;
+  --series-1:#3987e5; --series-2:#d95926;
+  --danger:#f08a5d; --danger-soft:#33221a; --ok:#5fc27e; --ok-soft:#18291e; --warn:#e0b04a; --warn-soft:#2e2715;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+  --shadow-lg:0 10px 40px rgba(0,0,0,.5);
+  --st-nouveau:#a3a29c; --st-nouveau-bg:#262624;
+  --st-a_rappeler:#e5a54b; --st-a_rappeler-bg:#2f2617;
+  --st-contacte:#6ea4ec; --st-contacte-bg:#1b2738;
+  --st-interesse:#ad8cf5; --st-interesse-bg:#272038;
+  --st-demo:#4cc0b4; --st-demo-bg:#152c2a;
+  --st-proposition:#8f8cf0; --st-proposition-bg:#212038;
+  --st-signe:#5fc27e; --st-signe-bg:#18291e;
+  --st-perdu:#ec7d84; --st-perdu-bg:#331c1e;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--text);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  font-feature-settings:"cv11","ss01","tnum" 0;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent-text);text-decoration:none}
+a:hover{text-decoration:underline}
+h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-.01em}
+h1{font-size:22px} h2{font-size:16px} h3{font-size:14px}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--text-2)} .faint{color:var(--text-3)}
+.small{font-size:12.5px}
+.hidden{display:none!important}
+
+/* Layout */
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:232px;flex:none;background:var(--surface);border-right:1px solid var(--border);
+  position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:18px 12px;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 10px 20px}
+.brand-mark{width:28px;height:28px;border-radius:8px;background:var(--accent);display:grid;place-items:center;flex:none}
+.brand-title{font-weight:600;font-size:13.5px;line-height:1.2}
+.brand-sub{font-size:11.5px;color:var(--text-3)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{
+  display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:var(--radius-sm);
+  color:var(--text-2);font-weight:500;text-decoration:none;
+}
+.nav a:hover{background:var(--surface-2);color:var(--text)}
+.nav a.active{background:var(--accent-soft);color:var(--accent-text)}
+.nav svg{width:17px;height:17px;flex:none}
+.nav .count{margin-left:auto;font-size:11.5px;background:var(--danger-soft);color:var(--danger);padding:0 7px;border-radius:20px;font-weight:600}
+.sidebar-foot{margin-top:auto;display:flex;flex-direction:column;gap:8px;padding:0 4px}
+.save-state{font-size:11.5px;color:var(--text-3);padding:0 6px;display:flex;align-items:center;gap:6px}
+.save-state::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.main{flex:1;min-width:0}
+.page{max-width:1240px;margin:0 auto;padding:28px 32px 64px}
+.page.wide{max-width:none}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.page-head p{margin:4px 0 0;color:var(--text-2)}
+.mobile-top,.bottom-nav{display:none}
+
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.card-head h2{font-size:14px}
+.grid{display:grid;gap:16px}
+.g-kpi{grid-template-columns:repeat(5,minmax(0,1fr))}
+.g-2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.g-dash{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}
+.kpi-label{font-size:12px;color:var(--text-2);font-weight:500}
+.kpi-value{font-size:26px;font-weight:600;letter-spacing:-.02em;margin-top:6px;font-variant-numeric:tabular-nums;line-height:1.15}
+.kpi-value small{font-size:14px;color:var(--text-3);font-weight:500;letter-spacing:0}
+.kpi-sub{font-size:12px;color:var(--text-3);margin-top:4px}
+.progress{height:6px;background:var(--surface-3);border-radius:6px;overflow:hidden;margin-top:10px}
+.progress > span{display:block;height:100%;background:var(--accent);border-radius:6px;transition:width .3s}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  height:34px;padding:0 14px;border-radius:var(--radius-sm);border:1px solid var(--border-strong);
+  background:var(--surface);color:var(--text);font-weight:500;cursor:pointer;white-space:nowrap;
+  transition:background .12s,border-color .12s;text-decoration:none!important;
+}
+.btn:hover{background:var(--surface-2)}
+.btn:focus-visible,.input:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--text-2)}
+.btn.ghost:hover{background:var(--surface-2);color:var(--text)}
+.btn.danger{color:var(--danger)}
+.btn.sm{height:28px;padding:0 10px;font-size:12.5px}
+.btn.lg{height:42px;padding:0 18px;font-size:15px}
+.btn svg{width:15px;height:15px}
+.btn.icon{width:34px;padding:0}
+.btn.sm.icon{width:28px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* Forms */
+.input,select.input,textarea.input{
+  width:100%;height:34px;padding:0 10px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);
+  background:var(--surface);outline:none;transition:border-color .12s,box-shadow .12s;
+}
+textarea.input{height:auto;padding:8px 10px;resize:vertical;min-height:72px;line-height:1.5}
+.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field > label,.label{font-size:12px;color:var(--text-2);font-weight:500}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 14px}
+.form-grid .full{grid-column:1/-1}
+.inline-input{
+  width:100%;border:1px solid transparent;background:transparent;border-radius:6px;padding:4px 7px;margin:0 -7px;
+  height:30px;outline:none;
+}
+.inline-input:hover{border-color:var(--border)}
+.inline-input:focus{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px var(--accent-soft)}
+select.inline-input{cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{
+  border:1px solid var(--border-strong);background:var(--surface);border-radius:20px;padding:4px 11px;
+  font-size:12.5px;cursor:pointer;color:var(--text-2);user-select:none;
+}
+.chip:hover{border-color:var(--text-3)}
+.chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-text);font-weight:500}
+.seg{display:inline-flex;flex-wrap:wrap;max-width:100%;background:var(--surface-2);border-radius:var(--radius-sm);padding:3px;gap:2px}
+.seg button{border:0;background:transparent;padding:4px 12px;border-radius:5px;cursor:pointer;color:var(--text-2);font-weight:500;font-size:13px}
+.seg button.on{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+
+/* Status pills */
+.pill{display:inline-flex;align-items:center;gap:6px;padding:2px 9px 2px 8px;border-radius:20px;font-size:12px;font-weight:500;white-space:nowrap;
+  background:var(--pbg,var(--surface-2));color:var(--pc,var(--text-2))}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.prio{display:inline-flex;gap:2px;align-items:center}
+.prio i{width:5px;height:12px;border-radius:2px;background:var(--surface-3)}
+.prio.p1 i{background:var(--danger)} .prio.p2 i:nth-child(-n+2){background:var(--warn)} .prio.p3 i:first-child{background:var(--text-3)}
+.tag{display:inline-block;padding:1px 7px;border-radius:5px;background:var(--surface-2);color:var(--text-2);font-size:11.5px;font-weight:500}
+.tag.late{background:var(--danger-soft);color:var(--danger)}
+.tag.today{background:var(--accent-soft);color:var(--accent-text)}
+
+/* Lists */
+.list{display:flex;flex-direction:column}
+.row-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--border)}
+.row-item:first-child{border-top:0;padding-top:2px}
+.row-main{flex:1;min-width:0}
+.row-title{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-title a{color:var(--text)}
+.row-sub{font-size:12.5px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty{color:var(--text-3);padding:18px 0;text-align:center;font-size:13px}
+
+/* Table */
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.toolbar .search{flex:1 1 240px;max-width:340px;position:relative}
+.toolbar .search svg{position:absolute;left:10px;top:9px;width:16px;height:16px;color:var(--text-3)}
+.toolbar .search input{padding-left:32px}
+.toolbar select.input{width:auto;min-width:130px}
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:auto}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+th{font-size:12px;font-weight:500;color:var(--text-2);background:var(--surface);position:sticky;top:0;cursor:pointer;user-select:none}
+th:hover{color:var(--text)}
+th .arrow{opacity:.6;margin-left:3px;font-size:10px}
+tbody tr{cursor:pointer}
+tbody tr:hover td{background:var(--surface-2)}
+tbody tr:last-child td{border-bottom:0}
+td .cab-name{font-weight:500}
+td .cab-sub{font-size:12px;color:var(--text-3)}
+
+/* Call mode */
+.call-head{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:16px;
+  display:flex;flex-wrap:wrap;gap:14px 24px;align-items:center;
+}
+.call-id{flex:1 1 280px;min-width:0}
+.call-id h1{font-size:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.call-meta{color:var(--text-2);margin-top:3px;font-size:13px}
+.phone-big{font-size:22px;font-weight:600;letter-spacing:.01em;font-variant-numeric:tabular-nums;color:var(--text)!important;display:inline-flex;align-items:center;gap:8px}
+.phone-big svg{width:18px;height:18px;color:var(--accent)}
+.timer{display:flex;align-items:center;gap:10px}
+.timer-val{font-size:22px;font-variant-numeric:tabular-nums;font-weight:600;min-width:66px;color:var(--text-3)}
+.timer.running .timer-val{color:var(--accent-text)}
+.rec-dot{width:8px;height:8px;border-radius:50%;background:var(--danger);display:none;animation:pulse 1.2s infinite}
+.timer.running .rec-dot{display:block}
+@keyframes pulse{50%{opacity:.25}}
+.results{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-bottom:16px}
+.res-btn{
+  border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-sm);padding:10px 8px;cursor:pointer;
+  text-align:left;display:flex;flex-direction:column;gap:2px;transition:border-color .12s,background .12s;min-height:58px;
+}
+.res-btn:hover{border-color:var(--accent);background:var(--accent-soft)}
+.res-btn b{font-weight:500;font-size:13px;line-height:1.25}
+.res-btn kbd{font-family:inherit;font-size:11px;color:var(--text-3)}
+.res-btn.pos b{color:var(--ok)} .res-btn.neg b{color:var(--st-perdu)}
+.call-grid{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:16px;align-items:start}
+.section-title{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);font-weight:600;margin:0 0 10px}
+.kv{display:grid;grid-template-columns:120px minmax(0,1fr);gap:2px 10px;align-items:center}
+.kv > label{font-size:12.5px;color:var(--text-2)}
+.divider{height:1px;background:var(--border);margin:18px 0}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin:-4px -18px 18px;padding:0 12px;overflow-x:auto}
+.tabs button{border:0;background:none;padding:10px 12px;cursor:pointer;color:var(--text-2);font-weight:500;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tabs button:hover{color:var(--text)}
+.tabs button.on{color:var(--text);border-bottom-color:var(--accent)}
+.sticky-col{position:sticky;top:16px}
+
+/* Script */
+.step{border-left:2px solid var(--border);padding:2px 0 18px 18px;position:relative}
+.step:last-child{padding-bottom:4px}
+.step::before{content:attr(data-n);position:absolute;left:-12px;top:0;width:22px;height:22px;border-radius:50%;background:var(--surface);border:1px solid var(--border-strong);font-size:11.5px;font-weight:600;display:grid;place-items:center;color:var(--text-2)}
+.step.on{border-left-color:var(--accent)}
+.step.on::before{background:var(--accent);border-color:var(--accent);color:#fff}
+.step h3{margin-bottom:6px;cursor:pointer}
+.step-text{white-space:pre-wrap;color:var(--text);font-size:14.5px;line-height:1.65}
+.step-text .v{background:var(--accent-soft);color:var(--accent-text);border-radius:4px;padding:0 3px;font-weight:500}
+.step-text .ph{background:var(--warn-soft);color:var(--warn);border-radius:4px;padding:0 3px}
+.step-hint{font-size:12.5px;color:var(--text-3);margin-top:6px;white-space:pre-wrap}
+
+/* Objections */
+.obj{border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;background:var(--surface)}
+.obj summary{list-style:none;padding:11px 14px;cursor:pointer;font-weight:500;display:flex;gap:10px;align-items:center}
+.obj summary::-webkit-details-marker{display:none}
+.obj summary::after{content:"+";margin-left:auto;color:var(--text-3);font-weight:400;font-size:16px}
+.obj[open] summary::after{content:"–"}
+.obj .obj-body{padding:0 14px 14px;white-space:pre-wrap;line-height:1.65;font-size:14px}
+
+/* Calculator */
+.calc-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px}
+.hero{background:var(--accent-soft);border-radius:var(--radius);padding:22px;text-align:left}
+.hero-label{font-size:12.5px;color:var(--accent-text);font-weight:500}
+.hero-value{font-size:44px;font-weight:650;letter-spacing:-.03em;line-height:1.05;margin:4px 0 2px;color:var(--text);font-variant-numeric:tabular-nums}
+.hero-sub{color:var(--text-2);font-size:13.5px}
+.stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.stat{border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px}
+.stat .v{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.stat .l{font-size:12px;color:var(--text-2)}
+details.hyp summary{cursor:pointer;color:var(--text-2);font-size:12.5px;margin-top:12px}
+
+/* Kanban */
+.kanban{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(232px,1fr);gap:12px;overflow-x:auto;padding-bottom:12px;align-items:start}
+.kcol{background:var(--surface-2);border-radius:var(--radius);padding:10px;min-height:200px;transition:background .12s}
+.kcol.over{background:var(--accent-soft);outline:2px dashed var(--accent);outline-offset:-2px}
+.kcol-head{display:flex;align-items:center;justify-content:space-between;padding:2px 4px 10px;font-weight:600;font-size:13px}
+.kcol-head .n{color:var(--text-3);font-weight:500}
+.kcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:8px;cursor:grab;box-shadow:0 1px 1px rgba(0,0,0,.03)}
+.kcard:hover{border-color:var(--border-strong)}
+.kcard.dragging{opacity:.4}
+.kcard .t{font-weight:500;font-size:13px;line-height:1.3}
+.kcard .s{font-size:12px;color:var(--text-3);margin-top:2px}
+.kcard .f{display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:6px}
+.kcard select{display:none}
+
+/* Agenda */
+.agenda-group{margin-bottom:22px}
+.agenda-group h2{font-size:13px;display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.agenda-group h2 .n{color:var(--text-3);font-weight:500}
+.ag-item{display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px}
+.ag-when{width:92px;flex:none;font-variant-numeric:tabular-nums}
+.ag-when b{display:block;font-weight:600}
+.ag-when span{font-size:12px;color:var(--text-3)}
+.type-ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:none;background:var(--surface-2);color:var(--text-2)}
+.type-ic svg{width:15px;height:15px}
+.type-ic.demo{background:var(--st-demo-bg);color:var(--st-demo)}
+.type-ic.email{background:var(--st-interesse-bg);color:var(--st-interesse)}
+
+/* Charts */
+.chart{width:100%;display:block}
+.chart text{fill:var(--text-3);font-size:11px;font-family:inherit}
+.chart .grid-l{stroke:var(--border);stroke-width:1}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--text-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.hbar{display:grid;grid-template-columns:minmax(110px,170px) minmax(0,1fr) 64px;gap:10px;align-items:center;padding:5px 0;font-size:13px}
+.hbar .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-2)}
+.hbar .track{display:block;height:18px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.hbar .fill{display:block;height:100%;background:var(--series-1);border-radius:0 4px 4px 0;min-width:2px}
+.hbar .val{text-align:right;font-variant-numeric:tabular-nums;color:var(--text);font-weight:500}
+.hbar .val small{color:var(--text-3);font-weight:400}
+.funnel .hbar .fill{background:var(--accent)}
+.tooltip{position:fixed;pointer-events:none;background:var(--text);color:var(--bg);padding:6px 9px;border-radius:6px;font-size:12px;z-index:100;box-shadow:var(--shadow);white-space:nowrap;opacity:0;transition:opacity .1s}
+.tooltip.show{opacity:1}
+
+/* Modal */
+.overlay{position:fixed;inset:0;background:rgba(10,10,10,.38);display:flex;align-items:flex-start;justify-content:center;z-index:50;padding:8vh 16px 16px;overflow:auto}
+.modal{background:var(--surface);border-radius:12px;box-shadow:var(--shadow-lg);width:100%;max-width:540px;border:1px solid var(--border)}
+.modal.lg{max-width:760px}
+.modal-head{padding:18px 20px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.modal-head p{margin:3px 0 0;color:var(--text-2);font-size:13px}
+.modal-body{padding:16px 20px}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;align-items:center}
+.modal-foot .hint{margin-right:auto;font-size:12px;color:var(--text-3)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:9px 16px;border-radius:8px;font-size:13px;z-index:200;opacity:0;transition:all .2s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Responsive */
+@media (max-width:1100px){
+  .g-kpi{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .call-grid{grid-template-columns:minmax(0,1fr)}
+  .sticky-col{position:static}
+  .results{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media (max-width:860px){
+  .sidebar{display:none}
+  .mobile-top{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
+  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:20;padding-bottom:env(safe-area-inset-bottom)}
+  .bottom-nav a,.bottom-nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 7px;font-size:10.5px;color:var(--text-3);text-decoration:none!important;border:0;background:none;cursor:pointer}
+  .bottom-nav a.active{color:var(--accent-text)}
+  .bottom-nav svg{width:20px;height:20px}
+  .page{padding:18px 16px 96px}
+  .g-dash,.g-2,.calc-grid{grid-template-columns:minmax(0,1fr)}
+  .g-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .results{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .form-grid{grid-template-columns:minmax(0,1fr)}
+  .hero-value{font-size:36px}
+  .kanban{grid-auto-columns:minmax(220px,82vw)}
+  .kcard select{display:block;width:100%;margin-top:8px;height:30px;font-size:12.5px}
+  .toolbar select.input{flex:1 1 40%}
+  .toolbar .search{max-width:none}
+  .ag-when{width:70px}
+  .hbar{grid-template-columns:minmax(90px,120px) minmax(0,1fr) 56px}
+  .hide-sm{display:none}
+  .row-item .lbl,.ag-item .lbl{display:none}
+  .ag-item{gap:10px;padding:10px 12px}
+  .row-item .btn.sm{width:32px;padding:0}
+  .chart text{font-size:19px}
+  .row-item{gap:9px}
+  .drawer{position:fixed;inset:0;z-index:60;background:rgba(10,10,10,.38)}
+  .drawer .sidebar{display:flex;position:absolute;left:0;top:0;bottom:0;height:auto;box-shadow:var(--shadow-lg)}
+}
+@media (max-width:420px){
+  .kv{grid-template-columns:100px minmax(0,1fr)}
+  .phone-big{font-size:19px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="mobile-top">
+      <button class="btn ghost icon" data-act="drawer" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <strong style="font-size:14px">Prospection cabinets</strong>
+      <button class="btn ghost icon" data-act="theme" aria-label="Thème"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+    </div>
+    <main id="view"></main>
+  </div>
+</div>
+<nav class="bottom-nav" id="bottomNav"></nav>
+<div id="drawer"></div>
+<div id="modal"></div>
+<div class="tooltip" id="tooltip"></div>
+<div class="toast" id="toast"></div>
+<script>
+'use strict';
+/* ==========================================================================
+   Constantes
+   ========================================================================== */
+const STORE_KEY = 'prospection-cabinets-v1';
+const THEME_KEY = 'prospection-cabinets-theme';
+
+const STATUTS = [
+  {k:'nouveau', l:'Nouveau'},
+  {k:'a_rappeler', l:'À rappeler'},
+  {k:'contacte', l:'Contacté'},
+  {k:'interesse', l:'Intéressé'},
+  {k:'demo', l:'Démo planifiée'},
+  {k:'proposition', l:'Proposition envoyée'},
+  {k:'signe', l:'Signé'},
+  {k:'perdu', l:'Perdu'},
+];
+const STATUT_RANK = Object.fromEntries(STATUTS.map((s,i)=>[s.k,i]));
+const statutLabel = k => (STATUTS.find(s=>s.k===k)||{l:k}).l;
+
+const RESULTATS = [
+  {k:'no_answer', l:'Pas de réponse', key:'1'},
+  {k:'voicemail', l:'Messagerie', key:'2'},
+  {k:'barrage', l:'Barrage secrétariat', key:'3'},
+  {k:'rappel', l:'Décideur à rappeler', key:'4'},
+  {k:'argumente', l:'Argumenté', key:'5'},
+  {k:'refus', l:'Pas intéressé', key:'6', cls:'neg'},
+  {k:'demo', l:'Démo prise', key:'7', cls:'pos'},
+];
+const resLabel = k => (RESULTATS.find(r=>r.k===k)||{l:k}).l;
+const DECROCHE = new Set(['barrage','rappel','argumente','refus','demo']);
+const DECIDEUR = new Set(['argumente','refus','demo']);
+
+const SPECIALITES = ['Médecine générale','Pédiatrie','Dermatologie','Cardiologie','Gynécologie','Ophtalmologie','Kinésithérapie','Radiologie','Psychiatrie','ORL','Maison de santé pluriprofessionnelle'];
+const LOGICIELS = ['Doctolib','Weda','Crossway','MédiStory','HelloDoc','Axisanté','Maiia','Autre'];
+const ROLES = ['Secrétaire','Médecin','Gérant'];
+const IRRITANTS = [
+  {k:'telephone', l:'Téléphone saturé'},
+  {k:'absences', l:'Rendez-vous non honorés'},
+  {k:'cr', l:'Comptes rendus'},
+  {k:'emails', l:'Emails'},
+  {k:'ordonnances', l:'Renouvellements d’ordonnance'},
+  {k:'documents', l:'Documents'},
+];
+const irrLabel = k => (IRRITANTS.find(i=>i.k===k)||{l:'—'}).l;
+const USAGES = [
+  {k:'secretariat', l:'Secrétariat IA téléphonique'},
+  {k:'rappels', l:'Rappels de RDV'},
+  {k:'tri', l:'Tri des demandes'},
+  {k:'transcription', l:'Transcription de consultation'},
+  {k:'emails', l:'Emails'},
+  {k:'documents', l:'Documents'},
+];
+const usageLabel = k => (USAGES.find(i=>i.k===k)||{l:k}).l;
+const OUVERTURES = [{k:'froid',l:'Froid'},{k:'neutre',l:'Neutre'},{k:'curieux',l:'Curieux'},{k:'convaincu',l:'Convaincu'}];
+const BUDGETS = ['Non abordé','Aucun','< 200 €/mois','200 – 500 €/mois','> 500 €/mois'];
+const ECHEANCES = ['Non abordée','Immédiate','< 3 mois','3 – 6 mois','> 6 mois'];
+const TYPES_ACTION = [{k:'appel',l:'Appel'},{k:'demo',l:'Démo'},{k:'email',l:'Email'}];
+const typeLabel = k => (TYPES_ACTION.find(t=>t.k===k)||{l:k}).l;
+
+/* ==========================================================================
+   Utilitaires
+   ========================================================================== */
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4);
+const pad = n => String(n).padStart(2,'0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const todayStr = () => ymd(new Date());
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
+const parseYmd = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const dayDiff = (a, b) => Math.round((parseYmd(a) - parseYmd(b)) / 86400000);
+const fmtEur = n => (Math.round(n)||0).toLocaleString('fr-FR') + ' €';
+const fmtNum = (n, d=0) => (Number(n)||0).toLocaleString('fr-FR', {maximumFractionDigits:d, minimumFractionDigits:0});
+const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+const JOURS = ['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'];
+const MOIS = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+const fmtDate = s => { const d = parseYmd(s); return `${JOURS[d.getDay()]} ${d.getDate()} ${MOIS[d.getMonth()]}`; };
+const fmtDateTime = iso => { const d = new Date(iso); return `${d.getDate()} ${MOIS[d.getMonth()]} · ${pad(d.getHours())}h${pad(d.getMinutes())}`; };
+const fmtDur = s => s ? `${Math.floor(s/60)} min ${pad(s%60)}` : '—';
+function relDay(s){
+  const t = todayStr(), n = dayDiff(s, t);
+  if (n === 0) return "Aujourd’hui";
+  if (n === 1) return 'Demain';
+  if (n === -1) return 'Hier';
+  if (n < 0) return `il y a ${-n} j`;
+  return fmtDate(s);
+}
+function startOfWeek(d=new Date()){ const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); const wd = (x.getDay()+6)%7; x.setDate(x.getDate()-wd); return x; }
+const norm = s => String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+
+/* Icônes (traits fins) */
+const I = {
+  dash:'<path d="M3 13h8V3H3zM13 21h8V11h-8zM3 21h8v-6H3zM13 3v6h8V3z"/>',
+  list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  phone:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/>',
+  kanban:'<rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="12" rx="1"/><rect x="17" y="3" width="4" height="8" rx="1"/>',
+  cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  chart:'<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/>',
+  video:'<rect x="2" y="6" width="14" height="12" rx="2"/><path d="M22 8l-6 4 6 4z"/>',
+  arrowL:'<path d="M15 18l-6-6 6-6"/>',
+  arrowR:'<path d="M9 18l6-6-6-6"/>',
+  x:'<path d="M18 6L6 18M6 6l12 12"/>',
+  check:'<path d="M20 6L9 17l-5-5"/>',
+  edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
+  play:'<path d="M6 4l14 8-14 8z"/>',
+  stop:'<rect x="6" y="6" width="12" height="12" rx="1.5"/>',
+};
+const icon = (n, extra='') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ${extra}>${I[n]}</svg>`;
+
+/* ==========================================================================
+   Script et objections par défaut
+   ========================================================================== */
+const DEFAULT_SCRIPT = [
+  {id:'s1', title:'Passage du barrage secrétariat',
+   text:`Bonjour, {prenom} de {societe}. Je ne vais pas vous prendre longtemps.
+
+Je travaille avec des cabinets de {specialite} sur un sujet qui vous concerne directement : le téléphone qui sonne sans arrêt et les tâches administratives qui s’accumulent. L’idée n’est pas de remplacer qui que ce soit, au contraire : c’est un assistant qui prend les appels simples et les rappels de rendez-vous pour que vous puissiez souffler.
+
+Est-ce que vous êtes débordée au téléphone en ce moment ?
+→ (écouter) Justement, c’est pour ça que j’aimerais en parler deux minutes avec {docteur}. Quel est le meilleur moment pour le joindre : entre deux consultations, à 12 h 30 ou en fin de journée ?`,
+   hint:'Faire de la secrétaire une alliée : l’IA la soulage, elle ne la remplace pas. Noter son prénom dans les notes.'},
+  {id:'s2', title:'Accroche du médecin (15 secondes)',
+   text:`Bonjour {docteur}, {prenom} de {societe}. Je serai bref.
+
+Beaucoup de cabinets comme le vôtre à {ville} me disent la même chose : le téléphone sonne pendant les consultations, des patients n’arrivent pas à joindre le cabinet, et les soirées partent dans l’administratif.
+
+{offre} Est-ce que c’est un sujet chez vous aussi ?`,
+   hint:'Une seule question fermée à la fin. Se taire et laisser répondre.'},
+  {id:'s3', title:'Questions de découverte',
+   text:`• Combien d’appels recevez-vous par jour, à peu près ? Et combien restent sans réponse ?
+• Combien d’heures par semaine passez-vous, vous ou votre secrétariat, sur l’administratif : comptes rendus, emails, courriers, ordonnances ?
+• Qu’est-ce qui vous pèse le plus aujourd’hui ? Le téléphone, les rendez-vous non honorés, les comptes rendus, les emails, les renouvellements, les documents ?
+• Avez-vous déjà regardé des solutions d’IA ? Qu’en avez-vous pensé ?
+• Si vous décidiez d’avancer, qui d’autre serait impliqué dans la décision ?
+• C’est un sujet que vous aimeriez régler plutôt maintenant ou d’ici quelques mois ?`,
+   hint:'Remplir la qualification IA à gauche pendant l’échange : le calculateur se met à jour.'},
+  {id:'s4', title:'Proposition de valeur',
+   text:`D’après ce que vous me dites, {benefice}
+
+Concrètement, pour {cabinet}, on parle d’environ {heures_gagnees} heures récupérées par mois et d’un gain estimé de {gain_mensuel} par mois.
+
+{valeur_irritant}`,
+   hint:'Le paragraphe ci-dessous s’adapte automatiquement à l’irritant principal renseigné.'},
+  {id:'s5', title:'Closing : démo de 20 minutes',
+   text:`Le plus simple, c’est que je vous montre en 20 minutes comment ça fonctionnerait avec votre organisation et votre logiciel actuel. Vous jugerez sur pièce.
+
+Je peux vous proposer jeudi à 12 h 30, ou plutôt mardi après 18 h ?`,
+   hint:'Toujours proposer deux créneaux. Midi et fin de journée sont les plus réalistes pour un médecin.'},
+  {id:'s6', title:'Conclusion',
+   text:`Parfait. Je récapitule : on se voit [jour] à [heure] pour 20 minutes, je vous montre le secrétariat IA et la partie {benefice_court}.
+
+Je vous envoie l’invitation par email : c’est bien {email} ?
+
+Merci {docteur}, bonne fin de journée.`,
+   hint:'Confirmer l’email, planifier la démo dans « Prochaine action » et envoyer l’invitation dans la foulée.'},
+];
+
+const DEFAULT_VALUE_PROPS = {
+  telephone:`Votre problème principal, c’est le téléphone. Le secrétariat IA décroche à chaque appel, même pendant les consultations et la pause de midi, répond aux questions simples (horaires, adresse, documents à apporter), prend ou déplace les rendez-vous et ne vous transmet que ce qui demande vraiment une personne. Plus d’appels perdus, et votre secrétaire n’est plus interrompue toutes les deux minutes.`,
+  absences:`Votre problème principal, ce sont les rendez-vous non honorés. Les patients reçoivent un rappel automatique, peuvent confirmer, annuler ou décaler en une réponse, et le créneau libéré est reproposé immédiatement. Chaque absence évitée, c’est une consultation récupérée.`,
+  cr:`Votre problème principal, ce sont les comptes rendus. La consultation est transcrite et un projet de compte rendu est rédigé automatiquement : vous relisez, corrigez si besoin et validez. Vous gardez la main, mais vous ne tapez plus.`,
+  emails:`Votre problème principal, ce sont les emails. Les messages entrants sont triés, classés par urgence, et des réponses types sont préparées pour les demandes courantes. Vous ne traitez plus que ce qui compte.`,
+  ordonnances:`Votre problème principal, ce sont les renouvellements d’ordonnance. Les demandes sont recueillies, structurées et préparées pour votre validation, au lieu d’arriver par téléphone à n’importe quel moment de la journée.`,
+  documents:`Votre problème principal, ce sont les documents. Courriers, résultats et pièces reçues sont lus, classés et rattachés au bon dossier, avec un résumé de ce qui demande votre attention.`,
+  '':`Le secrétariat IA décroche à chaque appel, gère les rendez-vous et les rappels, trie les demandes et prépare les comptes rendus : votre équipe se concentre sur les patients.`,
+};
+
+const DEFAULT_OBJECTIONS = [
+  {id:'o1', q:'L’IA va faire des erreurs avec mes patients',
+   a:`C’est la bonne question à se poser, et c’est pour ça que l’IA ne prend aucune décision médicale.
+
+Elle fait ce qu’une secrétaire fait au premier niveau : répondre aux questions pratiques, proposer des créneaux, noter le motif. Dès qu’il y a un doute, une urgence ou un sujet médical, elle transfère au cabinet ou oriente vers le 15. Les règles sont définies avec vous avant la mise en route, et vous pouvez écouter ou relire chaque échange.
+
+Le plus simple : je vous montre en démo des conversations réelles, y compris les cas où elle passe la main.`},
+  {id:'o2', q:'Mes patients âgés ne voudront pas parler à un robot',
+   a:`Je comprends, c’est souvent la première crainte. Deux choses :
+
+1. La voix est naturelle, l’assistant parle lentement, reformule et ne coupe pas la parole. Beaucoup de patients âgés préfèrent ça à une sonnerie dans le vide ou à une application.
+2. Le patient peut demander à parler à quelqu’un à tout moment : l’appel est transféré ou un rappel est programmé.
+
+Aujourd’hui, quand la ligne est saturée, ces patients-là n’ont personne au bout du fil. Avec l’IA, ils ont au moins une réponse immédiate.`},
+  {id:'o3', q:'Et le secret médical, le RGPD, l’hébergement des données de santé (HDS) ?',
+   a:`Vous avez raison d’en parler en premier, c’est non négociable.
+
+Les données sont hébergées chez [hébergeur certifié HDS], en [pays d’hébergement]. Les échanges sont chiffrés, l’accès est limité à votre cabinet, et vous restez responsable de vos données : nous agissons comme sous-traitant au sens du RGPD, avec [contrat de sous-traitance / DPA] à votre disposition.
+
+Je peux vous envoyer [la documentation sécurité] avant la démo pour que vous puissiez la faire vérifier.`},
+  {id:'o4', q:'Ça va remplacer ma secrétaire',
+   a:`Non, et ce n’est pas l’objectif. Votre secrétaire connaît vos patients et votre organisation : c’est irremplaçable.
+
+Ce qu’on enlève, ce sont les tâches répétitives qui l’empêchent de faire son vrai travail : les vingt appels par jour pour demander les horaires, les confirmations de rendez-vous, les rappels. Elle gagne du temps pour l’accueil, les dossiers et les patients qui ont vraiment besoin d’elle.
+
+Dans les cabinets équipés, c’est souvent elle qui devient la plus grande défenseure de l’outil.`},
+  {id:'o5', q:'On a déjà Doctolib',
+   a:`Très bien, et ça reste votre outil d’agenda : on ne le remplace pas, on travaille avec.
+
+Doctolib gère les patients qui réservent en ligne. Mais une bonne partie de vos patients appelle encore : pour un rendez-vous urgent, une question, un résultat, une ordonnance. Ce sont ces appels-là que le secrétariat IA prend en charge, en s’appuyant sur votre agenda existant.
+
+Combien d’appels recevez-vous encore par jour malgré la prise de rendez-vous en ligne ?`},
+  {id:'o6', q:'C’est trop cher',
+   a:`Je comprends. Regardons les chiffres ensemble, avec vos données.
+
+Avec ce que vous m’avez dit, le gain estimé est d’environ {gain_mensuel} par mois, pour un abonnement à {prix} par mois. Autrement dit, l’outil se rembourse avec quelques consultations récupérées.
+
+La vraie question, c’est : combien vous coûtent aujourd’hui les appels manqués et les heures d’administratif ? La démo de 20 minutes sert justement à vérifier que le calcul tient pour votre cabinet.`},
+  {id:'o7', q:'Je n’ai pas le temps de mettre ça en place',
+   a:`C’est justement le problème qu’on veut régler : vous manquez de temps.
+
+La mise en place est prise en charge par nos soins : on récupère vos horaires, vos règles et vos motifs de consultation, on paramètre, et vous validez. De votre côté, c’est environ [durée de mise en place] de votre temps au total. Le service tourne ensuite tout seul.
+
+On commence par 20 minutes de démo pour voir si ça vaut le coup ?`},
+  {id:'o8', q:'Envoyez-moi une documentation',
+   a:`Avec plaisir. Pour vous envoyer quelque chose d’utile et pas une plaquette générique, deux questions rapides : vous recevez combien d’appels par jour environ, et qu’est-ce qui vous prend le plus de temps aujourd’hui ?
+
+(…)
+
+Je vous l’envoie à {email}. Honnêtement, une documentation ne montre pas ce que ça donne avec votre organisation : je vous propose de bloquer 20 minutes jeudi à 12 h 30 ou mardi après 18 h, et si après lecture ça ne vous parle pas, vous annulez.`},
+  {id:'o9', q:'Le docteur ne prend pas d’appels commerciaux',
+   a:`Je comprends tout à fait, et c’est normal de le protéger.
+
+Ce n’est pas un appel pour vendre un produit au hasard : c’est un sujet qui vous concerne aussi directement, la charge téléphonique du cabinet. D’ailleurs, vous êtes sûrement la mieux placée pour me dire combien d’appels vous gérez par jour ?
+
+(…)
+
+Est-ce que je peux lui laisser un message de votre part, ou vaut-il mieux que je rappelle à 12 h 30 ou après 18 h ? Sinon, quelle est son adresse email pour lui envoyer deux lignes ?`},
+  {id:'o10', q:'On verra plus tard',
+   a:`Bien sûr. Simplement, pour que je sache quand revenir vers vous : qu’est-ce qui devrait changer d’ici là ?
+
+Pendant ce temps, avec les chiffres qu’on a vus, c’est environ {gain_mensuel} par mois qui continuent de partir. La démo dure 20 minutes et ne vous engage à rien : on peut la caler dans trois semaines si c’est plus confortable. Plutôt un midi ou une fin de journée ?`},
+  {id:'o11', q:'Je dois en parler à mes associés',
+   a:`C’est normal, c’est une décision collective.
+
+Le plus efficace, c’est que vos associés voient la démo en même temps que vous : ça évite de devoir tout leur réexpliquer et chacun pose ses questions. 20 minutes, en visio, un midi ou en fin de journée.
+
+Quel jour réunit le plus facilement vos associés ?`},
+];
+
+const DEFAULT_SETTINGS = {
+  prenom:'Camille', societe:'Medivox',
+  offre:'J’aide les cabinets médicaux à ne plus perdre d’appels et à réduire l’administratif grâce à un secrétariat IA qui décroche 24 h/24 et des automatisations sur mesure.',
+  benefice:'votre cabinet répond à tous les appels et votre équipe récupère plusieurs heures par semaine, sans changer vos outils.',
+  beneficeCourt:'rappels de rendez-vous',
+  prix:290, objAppels:25, objDemos:5,
+  hyp:{tauxRdvManques:30, tauxRecup:70, reducAbsences:50, tauxAutomatisation:35},
+};
+</script>
+<script>
+/* ==========================================================================
+   Données d’exemple
+   Numéros réservés à la fiction par l’ARCEP : 01 99 00, 02 61 91, 03 53 01, 04 65 71, 05 36 49
+   ========================================================================== */
+// [nom, spécialité, praticiens, secrétaires, adresse, cp, ville, tel, interlocuteur, rôle, décideur, logiciel, externalisé, priorité, statut, irritant, ouverture, séquence d’appels, dernier appel (jours), prochaine action [type, jours, heure], notes]
+const SAMPLE = [
+  ['Cabinet médical des Batignolles','Médecine générale',3,1,'14 rue Brochant','75017','Paris','01 99 00 21 47','Sophie','Secrétaire','Dr Antoine Lefèvre','Doctolib',false,1,'a_rappeler','telephone','curieux',['no_answer','barrage','rappel'],3,['appel',-2,'12:30'],'Secrétaire très sollicitée, ligne souvent occupée. Le Dr Lefèvre est joignable à 12 h 30.'],
+  ['Maison de santé du Val de Loire','Maison de santé pluriprofessionnelle',9,3,'2 allée des Tisserands','37000','Tours','02 61 91 33 08','Nathalie Morel','Gérant','Dr Claire Besson','Weda',false,1,'interesse','telephone','convaincu',['barrage','rappel','argumente'],4,['appel',-2,'18:15'],'Coordinatrice motivée. 9 praticiens, 3 secrétaires débordées. Veut associer les médecins à la décision.'],
+  ['Cabinet de pédiatrie Les Petits Pas','Pédiatrie',2,1,'8 place Graslin','44000','Nantes','02 61 91 47 22','Laura','Secrétaire','Dr Hélène Garnier','Doctolib',false,1,'demo','telephone','curieux',['barrage','argumente','demo'],0,['demo',3,'12:30'],'Pics d’appels le matin entre 8 h et 10 h (parents). Démo calée, inviter aussi la secrétaire.'],
+  ['Centre de dermatologie Saint-Michel','Dermatologie',4,2,'31 cours Victor Hugo','33000','Bordeaux','05 36 49 12 85','Isabelle','Secrétaire','Dr Julien Mercier','Doctolib',false,2,'contacte','absences','neutre',['no_answer','argumente'],2,['appel',0,'14:00'],'Beaucoup de rendez-vous non honorés (délais longs). Demande des chiffres concrets.'],
+  ['Cabinet de cardiologie Bellecour','Cardiologie',3,2,'5 place Bellecour','69002','Lyon','04 65 71 20 14','Dr Philippe Rousseau','Médecin','Dr Philippe Rousseau','Crossway',false,1,'proposition','cr','convaincu',['barrage','rappel','argumente','demo','argumente'],5,['appel',-1,'12:45'],'Démo très positive, intérêt fort pour la transcription des consultations. Proposition envoyée, relancer.'],
+  ['Cabinet du Dr Isabelle Fontaine','Gynécologie',1,0,'22 rue Nationale','59000','Lille','','','Médecin','Dr Isabelle Fontaine','MédiStory',true,2,'nouveau','','',[],null,null,'Secrétariat externalisé. Trouver le numéro direct.'],
+  ['Centre ophtalmologique Capitole','Ophtalmologie',5,3,'12 rue d’Alsace-Lorraine','31000','Toulouse','05 36 49 70 32','Marion','Secrétaire','Dr Marc Delmas','Doctolib',false,1,'demo','telephone','curieux',['no_answer','barrage','rappel','demo'],2,['demo',0,'18:15'],'Standard saturé, 3 secrétaires. Démo ce soir avec le Dr Delmas et l’associée.'],
+  ['Cabinet de kinésithérapie du Lez','Kinésithérapie',4,0,'48 avenue de la Pompignane','34000','Montpellier','04 65 71 58 90','Thomas Roux','Gérant','Thomas Roux','Doctolib',false,3,'a_rappeler','telephone','neutre',['voicemail','no_answer','rappel'],5,['appel',-3,'13:00'],'Pas de secrétaire, les kinés décrochent entre deux séances. Rappeler à 13 h.'],
+  ['Cabinet de radiologie de l’Europe','Radiologie',6,5,'3 place de l’Europe','67000','Strasbourg','03 53 01 18 26','Carole Weber','Gérant','Dr François Klein','Autre',false,2,'contacte','telephone','neutre',['barrage','argumente'],0,['email',1,'09:00'],'Gérante intéressée par la prise de rendez-vous téléphonique. Envoyer un récapitulatif par email.'],
+  ['Cabinet du Dr Mathieu Perrin','Psychiatrie',1,0,'17 rue de la Monnaie','35000','Rennes','02 61 91 62 05','Dr Mathieu Perrin','Médecin','Dr Mathieu Perrin','HelloDoc',true,3,'perdu','emails','froid',['no_answer','argumente','refus'],9,null,'Volume d’appels faible, secrétariat externalisé satisfaisant. Pas de besoin.'],
+  ['Cabinet ORL du Prado','ORL',2,1,'210 avenue du Prado','13008','Marseille','04 65 71 37 49','Karine','Secrétaire','Dr Nadia Benali','Doctolib',false,2,'a_rappeler','telephone','neutre',['no_answer','barrage'],1,['appel',0,'12:30'],'Secrétaire ouverte, le Dr Benali opère le matin. Rappeler à midi.'],
+  ['Maison de santé des Chartrons','Maison de santé pluriprofessionnelle',12,4,'56 quai des Chartrons','33300','Bordeaux','05 36 49 28 63','','Secrétaire','Dr Olivier Lacoste','Weda',false,1,'nouveau','','',[],null,null,''],
+  ['Cabinet médical du Vieux-Lille','Médecine générale',2,1,'9 rue de la Monnaie','59800','Lille','03 53 01 72 38','Émilie','Secrétaire','Dr Céline Dubois','Weda',false,2,'contacte','ordonnances','curieux',['barrage','rappel','argumente'],0,['appel',3,'18:30'],'Beaucoup de demandes de renouvellement par téléphone. Le Dr Dubois veut réfléchir.'],
+  ['Cabinet de pédiatrie de la Croix-Rousse','Pédiatrie',3,1,'27 boulevard de la Croix-Rousse','69004','Lyon','04 65 71 64 12','Aurélie','Secrétaire','Dr Laurent Girard','Doctolib',false,1,'a_rappeler','telephone','',['voicemail','barrage'],0,['appel',1,'12:30'],'Secrétaire seule pour 3 pédiatres. A suggéré de rappeler à 12 h 30.'],
+  ['Cabinet du Dr Anne Moreau','Dermatologie',1,1,'4 avenue Jean Médecin','06000','Nice','04 65 71 81 27','Dr Anne Moreau','Médecin','Dr Anne Moreau','Doctolib',false,2,'signe','absences','convaincu',['rappel','argumente','demo','argumente'],3,null,'Signé : rappels de RDV + secrétariat IA. Démarrage prévu le mois prochain. [référence client] potentielle.'],
+  ['Cabinet de gynécologie Sainte-Anne','Gynécologie',3,1,'38 rue de la Santé','75014','Paris','01 99 00 58 73','Céline','Secrétaire','Dr Valérie Chevalier','Doctolib',false,2,'interesse','absences','curieux',['no_answer','barrage','argumente'],3,['appel',0,'12:30'],'Intéressée par les rappels de RDV. Doit en parler à ses deux associées.'],
+  ['Cabinet médical Darcy','Médecine générale',2,0,'11 boulevard de Sévigné','21000','Dijon','03 53 01 90 54','','Médecin','Dr Pierre Masson','MédiStory',true,2,'nouveau','','',[],null,null,''],
+  ['Centre de kinésithérapie Grenoble Gare','Kinésithérapie',6,1,'15 rue Émile Gueymard','38000','Grenoble','04 65 71 42 86','Julie Faure','Gérant','Julie Faure','Doctolib',false,3,'nouveau','','',[],null,null,''],
+  ['Cabinet de cardiologie Saint-Cyprien','Cardiologie',2,1,'7 place Olivier','31300','Toulouse','05 36 49 51 17','Dr Éric Bonnet','Médecin','Dr Éric Bonnet','Crossway',false,2,'perdu','cr','froid',['barrage','refus'],11,null,'Méfiant vis-à-vis de l’IA. Ne pas relancer avant 6 mois.'],
+  ['Cabinet de psychiatrie Haussmann','Psychiatrie',3,1,'92 boulevard Haussmann','75009','Paris','01 99 00 36 92','Virginie','Secrétaire','Dr Sylvie Laurent','Doctolib',false,3,'contacte','emails','neutre',['barrage','argumente'],0,['email',0,'17:00'],'Beaucoup d’emails de patients à trier. Envoyer un exemple concret.'],
+  ['Cabinet médical du Port','Médecine générale',3,1,'5 quai Vendeuvre','14000','Caen','02 61 91 85 40','Morgane','Secrétaire','Dr Yann Le Gall','Weda',false,1,'interesse','telephone','curieux',['no_answer','rappel','argumente'],2,['appel',2,'12:30'],'Le Dr Le Gall perd des patients faute de réponse au téléphone. Prêt pour une démo, attend son associé.'],
+  ['Maison de santé Clairmarais','Maison de santé pluriprofessionnelle',8,2,'40 rue de Courcelles','51100','Reims','03 53 01 26 79','Sandrine Petit','Gérant','Dr Benoît Lambert','Weda',false,1,'a_rappeler','telephone','',['no_answer','voicemail','barrage','rappel'],0,['appel',2,'18:15'],'Coordinatrice : voir avec le Dr Lambert (président de la SISA).'],
+  ['Cabinet ORL Beaumont','ORL',3,1,'18 rue Joffre','64000','Pau','05 36 49 83 06','','Secrétaire','Dr Hugo Fabre','HelloDoc',false,2,'nouveau','','',[],null,null,''],
+  ['Centre d’imagerie médicale Limoges Centre','Radiologie',4,3,'25 avenue Garibaldi','87000','Limoges','05 36 49 64 21','','Secrétaire','Dr Martine Petit','Autre',false,3,'nouveau','','',[],null,null,''],
+  ['Cabinet d’ophtalmologie Opéra','Ophtalmologie',2,2,'6 rue de la Paix','75002','Paris','01 99 00 74 15','Nadia','Secrétaire','Dr Karim Haddad','Doctolib',false,2,'a_rappeler','telephone','neutre',['no_answer','barrage'],0,['appel',1,'18:00'],'Secrétaire dit que le docteur ne prend pas d’appels commerciaux. Tenter un email.'],
+];
+
+const CALLS_PER_PRAT = {'Médecine générale':24,'Pédiatrie':30,'Dermatologie':20,'Cardiologie':16,'Gynécologie':18,'Ophtalmologie':26,'Kinésithérapie':12,'Radiologie':22,'Psychiatrie':7,'ORL':18,'Maison de santé pluriprofessionnelle':16};
+const CONSULT_VALUE = {'Médecine générale':30,'Pédiatrie':35,'Dermatologie':50,'Cardiologie':60,'Gynécologie':50,'Ophtalmologie':45,'Kinésithérapie':25,'Radiologie':60,'Psychiatrie':55,'ORL':45,'Maison de santé pluriprofessionnelle':30};
+const USAGES_BY_IRRITANT = {
+  telephone:['secretariat','rappels','tri'], absences:['rappels','secretariat'], cr:['transcription','documents'],
+  emails:['emails','tri'], ordonnances:['tri','secretariat'], documents:['documents','emails'],
+};
+
+function rng(seed){ let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+
+function slug(s){ return norm(s).replace(/^(cabinet|centre|maison de sante) (medical |de |d’|du |des |de la )?/,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,28); }
+
+function buildSample(){
+  const R = rng(20261019);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  // jours ouvrés passés (on saute les week-ends), index 0 = aujourd’hui
+  const workDays = [today];
+  for (let d = 1; workDays.length < 16; d++){ const x = addDays(today, -d); if (x.getDay() !== 0 && x.getDay() !== 6) workDays.push(x); }
+  const goodSlots = [[8,30,9,40],[12,10,13,40],[17,50,19,0]];
+  const badSlots = [[9,45,11,50],[14,0,17,30]];
+  const pickTime = (decroche) => {
+    const slots = (decroche ? R() < .75 : R() < .25) ? goodSlots : badSlots;
+    const [h1,m1,h2,m2] = slots[Math.floor(R()*slots.length)];
+    const span = (h2*60+m2) - (h1*60+m1);
+    const t = h1*60 + m1 + Math.floor(R()*span);
+    return [Math.floor(t/60), t%60];
+  };
+  const cabinets = [], calls = [];
+  const nowMinutes = now.getHours()*60 + now.getMinutes();
+  let todayMinutes = Math.max(8*60+40, nowMinutes - 15);
+  SAMPLE.forEach((r, i) => {
+    const [nom, spe, prat, sec, adresse, cp, ville, tel, contact, role, decideur, logiciel, ext, prio, statut, irritant, ouverture, seq, last, next, notes] = r;
+    const id = 'c' + (i+1);
+    const base = CALLS_PER_PRAT[spe] * prat;
+    const appelsJour = Math.max(5, Math.round(base * (0.85 + R()*0.3)));
+    const charge = sec > 0 ? appelsJour / sec : 999;
+    const partManques = ext ? 10 + Math.round(R()*6) : sec === 0 ? 35 + Math.round(R()*10) : Math.min(40, Math.round(12 + charge / 3 + R()*6));
+    const contacted = seq.length > 0;
+    const advanced = STATUT_RANK[statut] >= STATUT_RANK.contacte;
+    const c = {
+      id, sample:true, nom, specialite:spe, praticiens:prat, secretaires:sec, adresse, cp, ville,
+      tel: tel || '', email: tel ? `contact@${slug(nom)}.fr` : '',
+      interlocuteur: contact, role, decideur, logiciel, externalise: ext, priorite: prio, statut, notes,
+      qualif: {
+        appelsJour, partManques,
+        heuresSecretariat: ext ? 0 : sec * 35,
+        heuresAdmin: Math.round(prat * (4 + R()*4)),
+        irritant: contacted ? irritant : '',
+        usages: advanced ? (USAGES_BY_IRRITANT[irritant] || []) : [],
+        decideurIdentifie: contacted && (advanced || seq.includes('rappel')),
+        budget: STATUT_RANK[statut] >= STATUT_RANK.interesse && statut !== 'perdu' ? (prat > 4 ? '> 500 €/mois' : '200 – 500 €/mois') : advanced ? 'Non abordé' : '',
+        echeance: statut === 'signe' ? 'Immédiate' : STATUT_RANK[statut] >= STATUT_RANK.interesse && statut !== 'perdu' ? '< 3 mois' : advanced ? 'Non abordée' : '',
+        ouverture,
+      },
+      calc: null, next: null,
+      createdAt: addDays(today, -20).toISOString(), lastCall: null,
+    };
+    // Historique d’appels : du plus ancien au plus récent
+    if (contacted){
+      let offset = last;
+      const offsets = [];
+      for (let k = seq.length - 1; k >= 0; k--){
+        offsets[k] = Math.min(offset, 14);
+        // une tentative sans réponse le matin même, avant l’appel décroché de la journée
+        const sameDay = last === 0 && k === seq.length - 1 && ['no_answer','voicemail'].includes(seq[k-1]);
+        if (!sameDay) offset += 1 + Math.floor(R()*3);
+      }
+      seq.forEach((res, k) => {
+        const d = workDays[offsets[k]];
+        let h, m;
+        [h, m] = pickTime(DECROCHE.has(res));
+        if (offsets[k] === 0 && h*60 + m > nowMinutes - 10){ todayMinutes -= 18 + Math.floor(R()*25); h = Math.floor(todayMinutes/60); m = todayMinutes%60; }
+        const date = new Date(d.getFullYear(), d.getMonth(), d.getDate(), h, m);
+        const dur = res === 'no_answer' ? 0 : res === 'voicemail' ? 25 + Math.floor(R()*20) : res === 'barrage' ? 60 + Math.floor(R()*90) : res === 'demo' ? 300 + Math.floor(R()*240) : res === 'refus' ? 50 + Math.floor(R()*80) : 150 + Math.floor(R()*240);
+        const noteMap = {no_answer:'', voicemail:'Message laissé.', barrage:'Barrage secrétariat, docteur en consultation.', rappel:'Décideur identifié, rappeler sur le créneau indiqué.', argumente:'Pitch fait, intérêt à confirmer.', refus:'Pas intéressé pour le moment.', demo:'Démo de 20 min calée.'};
+        calls.push({id:uid(), cabinetId:id, date:date.toISOString(), duree:dur, resultat:res, note:noteMap[res]});
+        if (!c.lastCall || date.toISOString() > c.lastCall) c.lastCall = date.toISOString();
+      });
+    }
+    if (next){
+      const [type, days, time] = next;
+      c.next = {type, date: ymd(addDays(today, days)), time, note: type === 'demo' ? 'Démo 20 min en visio' : type === 'email' ? 'Envoyer récapitulatif + exemple' : 'Relance'};
+    }
+    cabinets.push(c);
+  });
+  calls.sort((a,b) => a.date.localeCompare(b.date));
+  return {cabinets, calls};
+}
+
+/* ==========================================================================
+   État et persistance
+   ========================================================================== */
+let state;
+function freshState(){
+  const {cabinets, calls} = buildSample();
+  return {
+    version:1, settings: structuredClone(DEFAULT_SETTINGS), cabinets, calls,
+    script: {steps: structuredClone(DEFAULT_SCRIPT), valueProps: structuredClone(DEFAULT_VALUE_PROPS)},
+    objections: structuredClone(DEFAULT_OBJECTIONS),
+  };
+}
+function load(){
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw){
+      const s = JSON.parse(raw);
+      s.settings = Object.assign(structuredClone(DEFAULT_SETTINGS), s.settings || {});
+      s.settings.hyp = Object.assign(structuredClone(DEFAULT_SETTINGS.hyp), s.settings.hyp || {});
+      s.script = s.script || {steps: structuredClone(DEFAULT_SCRIPT), valueProps: structuredClone(DEFAULT_VALUE_PROPS)};
+      s.objections = s.objections || structuredClone(DEFAULT_OBJECTIONS);
+      s.cabinets = s.cabinets || []; s.calls = s.calls || [];
+      state = s; return;
+    }
+  } catch (e) { console.warn('Lecture impossible, données réinitialisées', e); }
+  state = freshState(); persist();
+}
+let saveTimer = null;
+function persist(){
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); setSaveState('Enregistré'); }
+  catch (e) { setSaveState('Non enregistré'); console.warn(e); }
+}
+function save(){ clearTimeout(saveTimer); setSaveState('Enregistrement…'); saveTimer = setTimeout(persist, 300); }
+function setSaveState(t){ const el = $('#saveState'); if (el) el.textContent = t; }
+
+const cab = id => state.cabinets.find(c => c.id === id);
+const callsOf = id => state.calls.filter(k => k.cabinetId === id).sort((a,b) => b.date.localeCompare(a.date));
+
+/* ==========================================================================
+   Logique métier
+   ========================================================================== */
+function emptyQualif(){ return {appelsJour:'', partManques:'', heuresSecretariat:'', heuresAdmin:'', irritant:'', usages:[], decideurIdentifie:false, budget:'', echeance:'', ouverture:''}; }
+function newCabinet(){
+  return {id:uid(), sample:false, nom:'', specialite:'Médecine générale', praticiens:1, secretaires:1, adresse:'', cp:'', ville:'', tel:'', email:'',
+    interlocuteur:'', role:'Secrétaire', decideur:'', logiciel:'Doctolib', externalise:false, priorite:2, statut:'nouveau', notes:'',
+    qualif: emptyQualif(), calc:null, next:null, createdAt:new Date().toISOString(), lastCall:null};
+}
+
+/* Statut et prochaine action suggérés après un résultat d’appel */
+function suggestAfter(c, res){
+  const rank = STATUT_RANK[c.statut];
+  const keepIfAdvanced = s => (rank >= STATUT_RANK.contacte && c.statut !== 'perdu') ? c.statut : s;
+  const t = new Date();
+  const workday = n => { let d = new Date(t), k = 0; while (k < n){ d = addDays(d, 1); if (d.getDay() !== 0 && d.getDay() !== 6) k++; } return ymd(d); };
+  switch (res){
+    case 'no_answer': return {statut: keepIfAdvanced('a_rappeler'), next:{type:'appel', date:workday(1), time: t.getHours() < 12 ? '17:45' : '09:00'}};
+    case 'voicemail': return {statut: keepIfAdvanced('a_rappeler'), next:{type:'appel', date:workday(2), time:'12:30'}};
+    case 'barrage': return {statut: keepIfAdvanced('a_rappeler'), next:{type:'appel', date:workday(1), time:'12:30'}};
+    case 'rappel': return {statut: keepIfAdvanced('a_rappeler'), next:{type:'appel', date:workday(1), time:'18:15'}};
+    case 'argumente': return {statut: rank >= STATUT_RANK.interesse && c.statut !== 'perdu' ? c.statut : 'contacte', next:{type:'email', date:ymd(t), time:'17:30'}};
+    case 'refus': return {statut:'perdu', next:null};
+    case 'demo': return {statut:'demo', next:{type:'demo', date:workday(2), time:'12:30'}};
+  }
+  return {statut:c.statut, next:null};
+}
+
+/* File d’appels : relances en retard, relances du jour, priorité haute, jamais appelés, puis le reste */
+function callQueue(){
+  const t = todayStr();
+  const out = [];
+  for (const c of state.cabinets){
+    if (c.statut === 'signe' || c.statut === 'perdu') continue;
+    if (!c.tel) continue;
+    const calledToday = c.lastCall && ymd(new Date(c.lastCall)) === t;
+    let rank = null, reason = '';
+    if (c.next && c.next.type === 'appel'){
+      if (c.next.date < t){ rank = 0; reason = 'En retard'; }
+      else if (c.next.date === t){ rank = 1; reason = `Relance ${c.next.time || ''}`.trim(); }
+      else continue;
+    } else if (c.next && c.next.type === 'demo' && c.next.date >= t){
+      continue;
+    } else if (calledToday){
+      continue;
+    } else if (['demo','proposition'].includes(c.statut) && !(c.next && c.next.date <= t)){
+      continue;
+    } else if (c.priorite === 1){ rank = 2; reason = 'Priorité haute'; }
+    else if (!c.lastCall){ rank = 3; reason = 'Jamais appelé'; }
+    else { rank = 4; reason = 'À relancer'; }
+    out.push({c, rank, reason});
+  }
+  out.sort((a,b) => a.rank - b.rank
+    || (a.rank <= 1 ? (a.c.next.date + (a.c.next.time||'')).localeCompare(b.c.next.date + (b.c.next.time||'')) : 0)
+    || a.c.priorite - b.c.priorite
+    || (a.c.lastCall||'').localeCompare(b.c.lastCall||''));
+  return out;
+}
+
+function followUps(){
+  return state.cabinets.filter(c => c.next && c.next.date).map(c => ({c, n:c.next}))
+    .sort((a,b) => (a.n.date + (a.n.time||'')).localeCompare(b.n.date + (b.n.time||'')));
+}
+function overdueCount(){ const t = todayStr(); return state.cabinets.filter(c => c.next && c.next.date < t).length; }
+
+/* Calculateur */
+function calcDefaults(c){
+  const q = c.qualif || {};
+  const appels = Number(q.appelsJour) || CALLS_PER_PRAT[c.specialite] * (c.praticiens||1) || 20;
+  const manques = Number(q.partManques) || 20;
+  return {
+    manquesJour: Math.round(appels * manques / 100),
+    valeurConsult: CONSULT_VALUE[c.specialite] || 30,
+    tauxAbsence: 6,
+    heuresAdmin: Number(q.heuresAdmin) || Math.round((c.praticiens||1) * 5),
+    coutHoraire: 30,
+    consultMois: (c.praticiens||1) * (c.specialite === 'Psychiatrie' ? 9 : c.specialite === 'Radiologie' ? 30 : 18) * 21,
+  };
+}
+function calcGains(inp){
+  const h = state.settings.hyp, prix = Number(state.settings.prix) || 0;
+  const consultsManques = (+inp.manquesJour||0) * 21 * (h.tauxRdvManques/100) * (h.tauxRecup/100);
+  const consultsAbsences = (+inp.consultMois||0) * ((+inp.tauxAbsence||0)/100) * (h.reducAbsences/100);
+  const consults = consultsManques + consultsAbsences;
+  const heures = (+inp.heuresAdmin||0) * 4.33 * (h.tauxAutomatisation/100);
+  const gainMois = consults * (+inp.valeurConsult||0) + heures * (+inp.coutHoraire||0);
+  return {
+    consults, consultsManques, consultsAbsences, heures, gainMois, gainAn: gainMois*12, prix,
+    net: gainMois - prix, multiple: prix ? gainMois/prix : 0,
+    roi: prix ? (gainMois - prix)/prix*100 : 0,
+    payback: gainMois > 0 ? prix / (gainMois/30) : null,
+  };
+}
+function gainsFor(c){
+  if (c.calc && c.calc.result) return c.calc.result;
+  return calcGains(calcDefaults(c));
+}
+
+/* Variables du script */
+function scriptVars(c){
+  const s = state.settings;
+  const g = c ? gainsFor(c) : null;
+  const irr = c && c.qualif ? c.qualif.irritant : '';
+  return {
+    prenom: s.prenom, societe: s.societe, offre: s.offre, benefice: s.benefice, benefice_court: s.beneficeCourt,
+    prix: fmtEur(s.prix),
+    docteur: c ? (c.decideur || 'le docteur') : 'Dr [Nom]',
+    cabinet: c ? c.nom : '[cabinet]', specialite: c ? c.specialite.toLowerCase() : '[spécialité]', ville: c ? c.ville : '[ville]',
+    email: c && c.email ? c.email : '[email]',
+    gain_mensuel: g ? fmtEur(g.gainMois) : '[gain]', heures_gagnees: g ? fmtNum(g.heures) : '[heures]',
+    valeur_irritant: state.script.valueProps[irr] || state.script.valueProps[''] || '',
+  };
+}
+function fillVars(text, vars, html=true){
+  // deux passes : {valeur_irritant} peut contenir des variables
+  let t = String(text).replace(/\{valeur_irritant\}/g, vars.valeur_irritant);
+  if (!html) return t.replace(/\{(\w+)\}/g, (m,k) => vars[k] ?? m);
+  t = esc(t);
+  t = t.replace(/\{(\w+)\}/g, (m,k) => vars[k] != null ? `<span class="v">${esc(vars[k])}</span>` : m);
+  t = t.replace(/\[([^\]]+)\]/g, '<span class="ph">[$1]</span>');
+  return t;
+}
+
+/* Statistiques */
+function periodCalls(period){
+  if (period === 'all') return state.calls;
+  const n = period === '7' ? 7 : 30;
+  const from = ymd(addDays(new Date(), -(n-1)));
+  return state.calls.filter(k => ymd(new Date(k.date)) >= from);
+}
+function kpisToday(){
+  const t = todayStr();
+  const tc = state.calls.filter(k => ymd(new Date(k.date)) === t);
+  const ws = ymd(startOfWeek());
+  const wc = state.calls.filter(k => ymd(new Date(k.date)) >= ws);
+  const decideursW = wc.filter(k => DECIDEUR.has(k.resultat)).length;
+  const demosW = wc.filter(k => k.resultat === 'demo').length;
+  return {
+    appels: tc.length,
+    decroches: tc.filter(k => DECROCHE.has(k.resultat)).length,
+    decideurs: tc.filter(k => DECIDEUR.has(k.resultat)).length,
+    demosW, decideursW, transfo: pct(demosW, decideursW),
+  };
+}
+</script>
+<script>
+/* ==========================================================================
+   Interface : coque, navigation, routage
+   ========================================================================== */
+const ui = {
+  filters:{q:'', statut:'', specialite:'', ville:'', priorite:''},
+  sort:{key:'priorite', dir:1},
+  tab:'script', objQ:'', editScript:false, editObj:false,
+  period:'30', activeStep:0,
+  timer:{cabinetId:null, start:null, elapsed:0, int:null},
+  calcDraft:{},
+};
+
+const NAV = [
+  {r:'', l:'Tableau de bord', i:'dash'},
+  {r:'cabinets', l:'Cabinets', i:'list'},
+  {r:'appel', l:'Mode appel', i:'phone'},
+  {r:'pipeline', l:'Pipeline', i:'kanban'},
+  {r:'agenda', l:'Relances', i:'cal', badge:true},
+  {r:'stats', l:'Statistiques', i:'chart'},
+  {r:'parametres', l:'Paramètres', i:'gear'},
+];
+
+function route(){
+  const h = location.hash.replace(/^#\/?/, '');
+  const [name, arg] = h.split('/');
+  return {name: name || '', arg};
+}
+
+function renderShell(){
+  const r = route().name === 'cabinet' ? 'appel' : route().name;
+  const od = overdueCount();
+  const navHtml = NAV.map(n => `<a href="#/${n.r}" class="${r === n.r ? 'active' : ''}">${icon(n.i)}<span>${n.l}</span>${n.badge && od ? `<span class="count">${od}</span>` : ''}</a>`).join('');
+  const dark = document.documentElement.dataset.theme === 'dark' || (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+  const side = `
+    <div class="brand"><div class="brand-mark"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"><path d="M12 4v16M4 12h16"/></svg></div>
+      <div><div class="brand-title">Prospection</div><div class="brand-sub">Cabinets médicaux</div></div></div>
+    <nav class="nav">${navHtml}</nav>
+    <div class="sidebar-foot">
+      <button class="btn ghost sm" data-act="theme" style="justify-content:flex-start">${icon(dark ? 'sun' : 'moon')} ${dark ? 'Mode clair' : 'Mode sombre'}</button>
+      <div class="save-state" id="saveState">Enregistré</div>
+    </div>`;
+  $('#sidebar').innerHTML = side;
+  const bn = [NAV[0], NAV[1], NAV[2], NAV[4]];
+  $('#bottomNav').innerHTML = bn.map(n => `<a href="#/${n.r}" class="${r === n.r ? 'active' : ''}">${icon(n.i)}<span>${n.l.replace('Tableau de bord','Accueil').replace('Mode appel','Appel')}</span></a>`).join('')
+    + `<button data-act="drawer">${icon('menu')}<span>Plus</span></button>`;
+  $('#drawer').innerHTML = '';
+}
+
+function render(){
+  const {name, arg} = route();
+  renderShell();
+  hideTip();
+  let html;
+  switch (name){
+    case '': html = viewDashboard(); break;
+    case 'cabinets': html = viewCabinets(); break;
+    case 'cabinet': html = viewCall(arg); break;
+    case 'appel': {
+      const q = callQueue();
+      if (q.length){ location.replace('#/cabinet/' + q[0].c.id); return; }
+      html = `<div class="page"><div class="page-head"><div><h1>Mode appel</h1><p>Aucun cabinet à appeler pour l’instant. Ajoutez des cabinets ou consultez les relances.</p></div></div></div>`;
+      break;
+    }
+    case 'pipeline': html = viewPipeline(); break;
+    case 'agenda': html = viewAgenda(); break;
+    case 'stats': html = viewStats(); break;
+    case 'parametres': html = viewSettings(); break;
+    default: html = viewDashboard();
+  }
+  $('#view').innerHTML = html;
+  if (name === 'cabinet') afterCallRender();
+  if (name === 'pipeline') bindKanban();
+  window.scrollTo(0, 0);
+}
+
+/* Composants */
+const pill = s => `<span class="pill" style="--pc:var(--st-${s});--pbg:var(--st-${s}-bg)">${esc(statutLabel(s))}</span>`;
+const prio = p => `<span class="prio p${p}" title="Priorité ${p === 1 ? 'haute' : p === 2 ? 'moyenne' : 'basse'}"><i></i><i></i><i></i></span>`;
+const opts = (list, val, ph) => (ph != null ? `<option value="">${esc(ph)}</option>` : '') + list.map(o => {
+  const k = typeof o === 'object' ? o.k : o, l = typeof o === 'object' ? o.l : o;
+  return `<option value="${esc(k)}" ${String(k) === String(val) ? 'selected' : ''}>${esc(l)}</option>`;
+}).join('');
+const typeIcon = t => `<span class="type-ic ${t}">${icon(t === 'demo' ? 'video' : t === 'email' ? 'mail' : 'phone')}</span>`;
+function nextLabel(n){
+  if (!n) return '<span class="faint">—</span>';
+  const t = todayStr();
+  const cls = n.date < t ? 'late' : n.date === t ? 'today' : '';
+  return `<span class="tag ${cls}">${typeLabel(n.type)} · ${relDay(n.date)}${n.time ? ' ' + n.time.replace(':','h') : ''}</span>`;
+}
+
+/* ==========================================================================
+   Tableau de bord
+   ========================================================================== */
+function viewDashboard(){
+  const s = state.settings, k = kpisToday();
+  const q = callQueue();
+  const t = todayStr();
+  const relances = followUps().filter(x => x.n.date <= t);
+  const h = new Date().getHours();
+  const hello = h < 18 ? 'Bonjour' : 'Bonsoir';
+  const kpi = (label, value, sub, progress) => `<div class="card"><div class="kpi-label">${label}</div><div class="kpi-value">${value}</div>${progress != null ? `<div class="progress"><span style="width:${Math.min(100, progress)}%"></span></div>` : ''}<div class="kpi-sub">${sub}</div></div>`;
+  return `<div class="page">
+    <div class="page-head">
+      <div><h1>${hello} ${esc(s.prenom)}</h1><p>${fmtDate(t).replace(/^\w/, c => c.toUpperCase())} · ${q.length} cabinet${q.length > 1 ? 's' : ''} dans la file d’appels</p></div>
+      <div class="btn-row">
+        <button class="btn" data-act="newCabinet">${icon('plus')} Ajouter un cabinet</button>
+        ${q.length ? `<a class="btn primary" href="#/cabinet/${q[0].c.id}">${icon('phone')} Lancer la session d’appels</a>` : ''}
+      </div>
+    </div>
+    <div class="grid g-kpi" style="margin-bottom:16px">
+      ${kpi('Appels du jour', `${k.appels}<small> / ${s.objAppels}</small>`, k.appels >= s.objAppels ? 'Objectif atteint' : `Encore ${s.objAppels - k.appels} pour l’objectif`, pct(k.appels, s.objAppels))}
+      ${kpi('Taux de décroché', `${pct(k.decroches, k.appels)}<small> %</small>`, `${k.decroches} décroché${k.decroches > 1 ? 's' : ''} aujourd’hui`)}
+      ${kpi('Décideurs atteints', `${k.decideurs}`, `Aujourd’hui · ${k.decideursW} cette semaine`)}
+      ${kpi('Démos cette semaine', `${k.demosW}<small> / ${s.objDemos}</small>`, k.demosW >= s.objDemos ? 'Objectif atteint' : `Encore ${s.objDemos - k.demosW} cette semaine`, pct(k.demosW, s.objDemos))}
+      ${kpi('Taux de transformation', `${k.transfo}<small> %</small>`, 'Démos / décideurs atteints (semaine)')}
+    </div>
+    <div class="grid g-dash" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-head"><h2>File d’appels</h2><span class="faint small">Retards, priorité haute, puis jamais appelés</span></div>
+        <div class="list">${q.slice(0, 8).map(({c, reason, rank}) => `
+          <div class="row-item">
+            ${prio(c.priorite)}
+            <div class="row-main"><div class="row-title"><a href="#/cabinet/${c.id}">${esc(c.nom)}</a></div>
+              <div class="row-sub">${esc(c.specialite)} · ${esc(c.ville)}${c.decideur ? ' · ' + esc(c.decideur) : ''}</div></div>
+            <span class="tag ${rank === 0 ? 'late' : rank === 1 ? 'today' : ''}">${esc(reason)}</span>
+            <a class="btn sm" href="#/cabinet/${c.id}">${icon('phone')}<span class="lbl">Appeler</span></a>
+          </div>`).join('') || '<div class="empty">File vide. Bravo, ou ajoutez des cabinets.</div>'}
+        </div>
+        ${q.length > 8 ? `<div class="small faint" style="margin-top:10px">+ ${q.length - 8} autres cabinets</div>` : ''}
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Relances du jour et en retard</h2><a class="small" href="#/agenda">Tout voir</a></div>
+        <div class="list">${relances.map(({c, n}) => `
+          <div class="row-item">
+            ${typeIcon(n.type)}
+            <div class="row-main"><div class="row-title"><a href="#/cabinet/${c.id}">${esc(c.nom)}</a></div>
+              <div class="row-sub">${typeLabel(n.type)}${n.note ? ' · ' + esc(n.note) : ''}</div></div>
+            <span class="tag ${n.date < t ? 'late' : 'today'}">${n.date < t ? relDay(n.date) : (n.time || '').replace(':','h') || 'Auj.'}</span>
+            <a class="btn sm" href="#/cabinet/${c.id}">${icon('phone')}<span class="lbl">Appeler</span></a>
+          </div>`).join('') || '<div class="empty">Aucune relance aujourd’hui.</div>'}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>Activité sur 7 jours</h2>
+        <div class="legend"><span><i style="background:var(--series-1)"></i>Appels</span><span><i style="background:var(--series-2)"></i>Démos obtenues</span></div></div>
+      ${chart7days()}
+    </div>
+  </div>`;
+}
+
+function chart7days(){
+  const days = [];
+  for (let i = 6; i >= 0; i--) days.push(ymd(addDays(new Date(), -i)));
+  const data = days.map(d => {
+    const cs = state.calls.filter(k => ymd(new Date(k.date)) === d);
+    return {d, appels: cs.length, demos: cs.filter(k => k.resultat === 'demo').length};
+  });
+  const max = Math.max(4, ...data.map(x => x.appels));
+  const step = max <= 10 ? 2 : max <= 25 ? 5 : 10;
+  const top = Math.ceil(max / step) * step;
+  const W = 720, H = 220, L = 30, B = 26, T = 10;
+  const cw = (W - L) / 7, bw = Math.min(26, cw * .28);
+  const y = v => T + (H - T - B) * (1 - v / top);
+  let svg = '';
+  for (let v = 0; v <= top; v += step) svg += `<line class="grid-l" x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${v}</text>`;
+  const bar = (x, v, color) => {
+    if (!v) return '';
+    const y0 = y(0), y1 = y(v), r = Math.min(4, (y0 - y1) / 2, bw / 2);
+    return `<path d="M${x},${y0} V${y1 + r} Q${x},${y1} ${x + r},${y1} H${x + bw - r} Q${x + bw},${y1} ${x + bw},${y1 + r} V${y0} Z" fill="${color}"/>`;
+  };
+  data.forEach((p, i) => {
+    const cx = L + cw * i + cw / 2;
+    const dd = parseYmd(p.d);
+    svg += `<g data-tip="${esc(`${fmtDate(p.d)} · ${p.appels} appel${p.appels > 1 ? 's' : ''} · ${p.demos} démo${p.demos > 1 ? 's' : ''}`)}">
+      <rect x="${L + cw * i}" y="${T}" width="${cw}" height="${H - T - B}" fill="transparent"/>
+      ${bar(cx - bw - 1, p.appels, 'var(--series-1)')}${bar(cx + 1, p.demos, 'var(--series-2)')}
+      <text x="${cx}" y="${H - 8}" text-anchor="middle" style="${i === 6 ? 'fill:var(--text);font-weight:600' : ''}">${JOURS[dd.getDay()]} ${dd.getDate()}</text></g>`;
+  });
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Appels et démos sur 7 jours">${svg}</svg>`;
+}
+
+/* ==========================================================================
+   Base cabinets
+   ========================================================================== */
+function filteredCabinets(){
+  const f = ui.filters, q = norm(f.q);
+  let list = state.cabinets.filter(c =>
+    (!q || norm([c.nom, c.ville, c.decideur, c.interlocuteur, c.tel, c.specialite, c.logiciel].join(' ')).includes(q)) &&
+    (!f.statut || c.statut === f.statut) && (!f.specialite || c.specialite === f.specialite) &&
+    (!f.ville || c.ville === f.ville) && (!f.priorite || String(c.priorite) === f.priorite));
+  const {key, dir} = ui.sort;
+  const val = c => key === 'statut' ? STATUT_RANK[c.statut] : key === 'next' ? (c.next ? c.next.date + c.next.time : '9999') :
+    key === 'lastCall' ? (c.lastCall || '') : key === 'praticiens' ? +c.praticiens : key === 'priorite' ? +c.priorite : norm(c[key]);
+  list.sort((a,b) => { const x = val(a), y = val(b); return (x < y ? -1 : x > y ? 1 : 0) * dir || norm(a.nom).localeCompare(norm(b.nom)); });
+  return list;
+}
+function viewCabinets(){
+  const f = ui.filters;
+  const villes = [...new Set(state.cabinets.map(c => c.ville).filter(Boolean))].sort((a,b) => a.localeCompare(b,'fr'));
+  return `<div class="page">
+    <div class="page-head"><div><h1>Cabinets</h1><p>${state.cabinets.length} cabinets dans la base</p></div>
+      <div class="btn-row"><button class="btn primary" data-act="newCabinet">${icon('plus')} Ajouter un cabinet</button></div></div>
+    <div class="toolbar">
+      <div class="search">${icon('search')}<input class="input" id="cabSearch" data-filter="q" placeholder="Rechercher un cabinet, une ville, un médecin…" value="${esc(f.q)}"></div>
+      <select class="input" data-filter="statut">${opts(STATUTS, f.statut, 'Tous les statuts')}</select>
+      <select class="input" data-filter="specialite">${opts(SPECIALITES, f.specialite, 'Toutes les spécialités')}</select>
+      <select class="input" data-filter="ville">${opts(villes, f.ville, 'Toutes les villes')}</select>
+      <select class="input" data-filter="priorite">${opts([{k:'1',l:'Priorité haute'},{k:'2',l:'Priorité moyenne'},{k:'3',l:'Priorité basse'}], f.priorite, 'Toutes priorités')}</select>
+      ${Object.values(f).some(Boolean) ? `<button class="btn ghost sm" data-act="clearFilters">Effacer</button>` : ''}
+    </div>
+    <div id="cabTable">${cabTable()}</div>
+  </div>`;
+}
+function cabTable(){
+  const list = filteredCabinets();
+  const th = (k, l) => `<th data-act="sort" data-k="${k}">${l}${ui.sort.key === k ? `<span class="arrow">${ui.sort.dir > 0 ? '▲' : '▼'}</span>` : ''}</th>`;
+  return `<div class="table-wrap"><table>
+    <thead><tr>${th('nom','Cabinet')}${th('statut','Statut')}${th('priorite','Priorité')}${th('praticiens','Prat. / Secr.')}${th('decideur','Décideur')}${th('logiciel','Logiciel')}${th('lastCall','Dernier appel')}${th('next','Prochaine action')}</tr></thead>
+    <tbody>${list.map(c => `<tr data-act="open" data-id="${c.id}">
+      <td><div class="cab-name">${esc(c.nom)}</div><div class="cab-sub">${esc(c.specialite)} · ${esc(c.ville)}</div></td>
+      <td>${pill(c.statut)}</td><td>${prio(c.priorite)}</td>
+      <td class="num">${c.praticiens} / ${c.externalise ? '<span class="faint">ext.</span>' : c.secretaires}</td>
+      <td>${esc(c.decideur) || '<span class="faint">—</span>'}</td>
+      <td>${esc(c.logiciel)}</td>
+      <td class="small muted">${c.lastCall ? relDay(ymd(new Date(c.lastCall))) : '<span class="faint">Jamais</span>'}</td>
+      <td>${nextLabel(c.next)}</td></tr>`).join('') || `<tr><td colspan="8"><div class="empty">Aucun cabinet ne correspond à ces filtres.</div></td></tr>`}
+    </tbody></table></div>
+    <div class="small faint" style="margin-top:10px">${list.length} résultat${list.length > 1 ? 's' : ''}</div>`;
+}
+
+/* Formulaire cabinet */
+function cabinetForm(c, isNew){
+  const f = (k, l, type='text', extra='') => `<div class="field"><label for="f_${k}">${l}</label><input class="input" id="f_${k}" name="${k}" type="${type}" value="${esc(c[k])}" ${extra}></div>`;
+  openModal(`
+    <form id="cabForm" autocomplete="off">
+    <div class="modal-head"><div><h2>${isNew ? 'Nouveau cabinet' : 'Modifier le cabinet'}</h2><p>Les champs marqués d’un * sont obligatoires.</p></div>
+      <button type="button" class="btn ghost icon" data-act="closeModal" aria-label="Fermer">${icon('x')}</button></div>
+    <div class="modal-body"><div class="form-grid">
+      <div class="field full"><label for="f_nom">Nom du cabinet *</label><input class="input" id="f_nom" name="nom" required value="${esc(c.nom)}"></div>
+      <div class="field"><label>Spécialité</label><select class="input" name="specialite">${opts(SPECIALITES, c.specialite)}</select></div>
+      <div class="field"><label>Priorité</label><select class="input" name="priorite">${opts([{k:1,l:'1 · Haute'},{k:2,l:'2 · Moyenne'},{k:3,l:'3 · Basse'}], c.priorite)}</select></div>
+      ${f('praticiens','Nombre de praticiens','number','min="1"')}
+      ${f('secretaires','Nombre de secrétaires','number','min="0"')}
+      ${f('adresse','Adresse')}
+      <div class="form-grid" style="grid-template-columns:90px 1fr;gap:12px">${f('cp','Code postal')}${f('ville','Ville')}</div>
+      ${f('tel','Téléphone','tel')}
+      ${f('email','Email','email')}
+      ${f('interlocuteur','Interlocuteur')}
+      <div class="field"><label>Rôle de l’interlocuteur</label><select class="input" name="role">${opts(ROLES, c.role)}</select></div>
+      ${f('decideur','Décideur (ex. Dr Martin)')}
+      <div class="field"><label>Logiciel métier</label><select class="input" name="logiciel">${opts(LOGICIELS, c.logiciel)}</select></div>
+      <div class="field"><label>Secrétariat externalisé</label><select class="input" name="externalise">${opts([{k:'0',l:'Non'},{k:'1',l:'Oui'}], c.externalise ? '1' : '0')}</select></div>
+      <div class="field"><label>Statut</label><select class="input" name="statut">${opts(STATUTS, c.statut)}</select></div>
+      <div class="field full"><label>Notes</label><textarea class="input" name="notes" rows="3">${esc(c.notes)}</textarea></div>
+    </div></div>
+    <div class="modal-foot">
+      ${!isNew ? `<button type="button" class="btn ghost danger" data-act="deleteCabinet" data-id="${c.id}" style="margin-right:auto">Supprimer</button>` : ''}
+      <button type="button" class="btn" data-act="closeModal">Annuler</button>
+      <button type="submit" class="btn primary">${isNew ? 'Ajouter' : 'Enregistrer'}</button>
+    </div></form>`, 'lg');
+  $('#f_nom').focus();
+  $('#cabForm').onsubmit = e => {
+    e.preventDefault();
+    const d = Object.fromEntries(new FormData(e.target));
+    if (!d.nom.trim()) return;
+    Object.assign(c, d, {
+      nom:d.nom.trim(), praticiens: Math.max(1, +d.praticiens || 1), secretaires: Math.max(0, +d.secretaires || 0),
+      priorite: +d.priorite, externalise: d.externalise === '1',
+    });
+    if (isNew) state.cabinets.push(c);
+    save(); closeModal(); toast(isNew ? 'Cabinet ajouté' : 'Cabinet enregistré');
+    if (isNew) location.hash = '#/cabinet/' + c.id; else render();
+  };
+}
+</script>
+<script>
+/* ==========================================================================
+   Fiche cabinet en mode appel
+   ========================================================================== */
+function viewCall(id){
+  const c = cab(id);
+  if (!c) return `<div class="page"><div class="page-head"><div><h1>Cabinet introuvable</h1><p><a href="#/cabinets">Retour à la base cabinets</a></p></div></div></div>`;
+  if (ui.timer.cabinetId !== id) resetTimer(id);
+  const q = callQueue().filter(x => x.c.id !== id);
+  const telHref = 'tel:' + (c.tel || '').replace(/[^\d+]/g, '');
+  return `<div class="page wide" style="max-width:1400px">
+    <div class="call-head">
+      <div class="call-id">
+        <div class="small faint" style="margin-bottom:4px"><a href="#/cabinets" class="faint">Cabinets</a> / Mode appel</div>
+        <h1>${esc(c.nom)} ${pill(c.statut)} ${prio(c.priorite)}</h1>
+        <div class="call-meta">${esc(c.specialite)} · ${esc(c.ville)} · ${c.praticiens} praticien${c.praticiens > 1 ? 's' : ''}${c.interlocuteur ? ` · ${esc(c.interlocuteur)} (${esc(c.role.toLowerCase())})` : ''}${c.decideur ? ` · Décideur : <b>${esc(c.decideur)}</b>` : ''}</div>
+      </div>
+      <div>${c.tel ? `<a class="phone-big" href="${telHref}" data-act="dial">${icon('phone')}${esc(c.tel)}</a>` : '<span class="faint">Pas de numéro</span>'}
+        ${c.next ? `<div class="small" style="margin-top:4px">${nextLabel(c.next)}</div>` : ''}</div>
+      <div class="timer ${ui.timer.start ? 'running' : ''}" id="timer">
+        <span class="rec-dot"></span><span class="timer-val" id="timerVal">${fmtTimer(currentElapsed())}</span>
+        <button class="btn ${ui.timer.start ? '' : 'primary'}" data-act="timer" id="timerBtn">${ui.timer.start ? icon('stop') + ' Arrêter l’appel' : icon('play') + ' Démarrer l’appel'}</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn ghost" data-act="editCabinet" data-id="${c.id}" title="Modifier la fiche">${icon('edit')}</button>
+        ${q.length ? `<a class="btn" href="#/cabinet/${q[0].c.id}" title="Passer sans enregistrer : ${esc(q[0].c.nom)}">Suivant ${icon('arrowR')}</a>` : ''}
+      </div>
+    </div>
+
+    <div class="results">${RESULTATS.map(r => `<button class="res-btn ${r.cls || ''}" data-act="result" data-res="${r.k}"><b>${r.l}</b><kbd>Touche ${r.key}</kbd></button>`).join('')}</div>
+
+    <div class="call-grid">
+      <div class="card">
+        <p class="section-title">Cabinet</p>
+        <div class="kv">
+          ${kvInput(c,'interlocuteur','Interlocuteur')}
+          ${kvSelect(c,'role','Rôle',ROLES)}
+          ${kvInput(c,'decideur','Décideur')}
+          ${kvInput(c,'tel','Téléphone','tel')}
+          ${kvInput(c,'email','Email','email')}
+          ${kvInput(c,'adresse','Adresse')}
+          ${kvInput(c,'ville','Ville')}
+          ${kvSelect(c,'specialite','Spécialité',SPECIALITES)}
+          ${kvInput(c,'praticiens','Praticiens','number')}
+          ${kvInput(c,'secretaires','Secrétaires','number')}
+          ${kvSelect(c,'externalise','Secr. externalisé',[{k:'0',l:'Non'},{k:'1',l:'Oui'}], c.externalise ? '1' : '0')}
+          ${kvSelect(c,'logiciel','Logiciel',LOGICIELS)}
+          ${kvSelect(c,'priorite','Priorité',[{k:1,l:'1 · Haute'},{k:2,l:'2 · Moyenne'},{k:3,l:'3 · Basse'}])}
+          ${kvSelect(c,'statut','Statut',STATUTS)}
+        </div>
+        <div class="divider"></div>
+        <p class="section-title">Notes <span class="faint" style="text-transform:none;letter-spacing:0;font-weight:400">· enregistrées automatiquement</span></p>
+        <textarea class="input" data-cf="notes" rows="4" placeholder="Prénom de la secrétaire, horaires du docteur, contexte…">${esc(c.notes)}</textarea>
+        <div class="divider"></div>
+        <p class="section-title">Qualification IA</p>
+        ${qualifForm(c)}
+      </div>
+      <div class="card sticky-col">
+        <div class="tabs" role="tablist">${[['script','Script'],['objections','Objections'],['calc','Calculateur de gains'],['historique','Historique'],['next','Prochaine action']].map(([k,l]) =>
+          `<button class="${ui.tab === k ? 'on' : ''}" data-act="tab" data-tab="${k}" role="tab">${l}${k === 'historique' ? ` <span class="faint">${callsOf(c.id).length}</span>` : ''}</button>`).join('')}</div>
+        <div id="rightPanel">${rightPanel(c)}</div>
+      </div>
+    </div>
+    <div class="small faint" style="margin-top:14px">Raccourcis : 1 à 7 pour le résultat, D pour démarrer ou arrêter l’appel, Ctrl + Entrée pour enregistrer et passer au suivant.</div>
+  </div>`;
+}
+function kvInput(c, k, l, type='text'){ return `<label for="cf_${k}">${l}</label><input class="inline-input" id="cf_${k}" type="${type}" data-cf="${k}" value="${esc(c[k])}" placeholder="—">`; }
+function kvSelect(c, k, l, list, val){ return `<label for="cf_${k}">${l}</label><select class="inline-input" id="cf_${k}" data-cf="${k}">${opts(list, val ?? c[k])}</select>`; }
+
+function qualifForm(c){
+  const q = c.qualif = Object.assign(emptyQualif(), c.qualif || {});
+  const num = (k, l, suffix) => `<div class="field"><label for="q_${k}">${l}</label><div style="position:relative"><input class="input num" id="q_${k}" type="number" min="0" data-qf="${k}" value="${esc(q[k])}" placeholder="—" style="padding-right:${suffix.length * 7 + 18}px"><span class="faint small" style="position:absolute;right:10px;top:8px">${suffix}</span></div></div>`;
+  return `<div class="form-grid" style="gap:12px">
+    ${num('appelsJour','Appels entrants / jour','appels')}
+    ${num('partManques','Part d’appels manqués','%')}
+    ${num('heuresSecretariat','Secrétariat / semaine','h')}
+    ${num('heuresAdmin','Administratif / semaine','h')}
+    <div class="field full"><span class="label">Irritant principal</span>
+      <div class="chips">${IRRITANTS.map(i => `<button type="button" class="chip ${q.irritant === i.k ? 'on' : ''}" data-act="irritant" data-k="${i.k}">${i.l}</button>`).join('')}</div></div>
+    <div class="field full"><span class="label">Cas d’usage pressentis</span>
+      <div class="chips">${USAGES.map(u => `<button type="button" class="chip ${q.usages.includes(u.k) ? 'on' : ''}" data-act="usage" data-k="${u.k}">${u.l}</button>`).join('')}</div></div>
+    <div class="field full"><span class="label">Décideur identifié</span>
+      <div class="seg">${[['1','Oui'],['0','Non']].map(([k,l]) => `<button type="button" class="${(q.decideurIdentifie ? '1' : '0') === k ? 'on' : ''}" data-act="decId" data-k="${k}">${l}</button>`).join('')}</div></div>
+    <div class="field full"><span class="label">Ouverture à l’IA</span>
+      <div class="seg">${OUVERTURES.map(o => `<button type="button" class="${q.ouverture === o.k ? 'on' : ''}" data-act="ouverture" data-k="${o.k}">${o.l}</button>`).join('')}</div></div>
+    <div class="field"><label for="q_budget">Budget</label><select class="input" id="q_budget" data-qf="budget">${opts(BUDGETS, q.budget, '—')}</select></div>
+    <div class="field"><label for="q_echeance">Échéance</label><select class="input" id="q_echeance" data-qf="echeance">${opts(ECHEANCES, q.echeance, '—')}</select></div>
+  </div>`;
+}
+
+function rightPanel(c){
+  switch (ui.tab){
+    case 'script': return panelScript(c);
+    case 'objections': return panelObjections(c);
+    case 'calc': return panelCalc(c);
+    case 'historique': return panelHistory(c);
+    case 'next': return panelNext(c);
+  }
+  return '';
+}
+function refreshRight(){
+  const {name, arg} = route();
+  if (name !== 'cabinet') return;
+  const c = cab(arg); if (!c) return;
+  const p = $('#rightPanel'); if (p) p.innerHTML = rightPanel(c);
+}
+
+/* Script */
+const VAR_LIST = ['prenom','societe','offre','benefice','benefice_court','docteur','cabinet','specialite','ville','email','gain_mensuel','heures_gagnees','prix','valeur_irritant'];
+function panelScript(c){
+  const vars = scriptVars(c);
+  if (ui.editScript){
+    return `<div class="btn-row" style="justify-content:space-between;margin-bottom:14px">
+      <span class="small muted">Mode édition · les modifications sont enregistrées automatiquement.</span>
+      <div class="btn-row"><button class="btn sm ghost" data-act="resetScript">Restaurer le script par défaut</button><button class="btn sm primary" data-act="editScript">${icon('check')} Terminer</button></div></div>
+      <div class="small muted" style="margin-bottom:14px">Variables disponibles : ${VAR_LIST.map(v => `<code>{${v}}</code>`).join(' ')}. Les crochets [comme ceci] signalent un élément à compléter.</div>
+      ${state.script.steps.map((s, i) => `<div class="card" style="margin-bottom:10px;padding:14px">
+        <div class="field" style="margin-bottom:8px"><label>Étape ${i + 1} · titre</label><input class="input" data-step="${i}" data-sf="title" value="${esc(s.title)}"></div>
+        <div class="field" style="margin-bottom:8px"><label>Texte</label><textarea class="input" rows="7" data-step="${i}" data-sf="text">${esc(s.text)}</textarea></div>
+        <div class="field"><label>Conseil</label><input class="input" data-step="${i}" data-sf="hint" value="${esc(s.hint)}"></div></div>`).join('')}
+      <h3 style="margin:18px 0 8px">Proposition de valeur par irritant <span class="faint small" style="font-weight:400">· insérée via {valeur_irritant}</span></h3>
+      ${[...IRRITANTS, {k:'', l:'Irritant non renseigné'}].map(i => `<div class="field" style="margin-bottom:10px"><label>${i.l}</label><textarea class="input" rows="3" data-vp="${i.k}">${esc(state.script.valueProps[i.k] || '')}</textarea></div>`).join('')}`;
+  }
+  return `<div class="btn-row" style="justify-content:space-between;margin-bottom:16px">
+      <span class="small muted">Irritant : <b>${esc(irrLabel(c.qualif.irritant))}</b> · gain estimé <b>${vars.gain_mensuel}</b>/mois</span>
+      <button class="btn sm ghost" data-act="editScript">${icon('edit')} Modifier le script</button></div>
+    <div style="padding-left:12px">${state.script.steps.map((s, i) => `<div class="step ${ui.activeStep === i ? 'on' : ''}" data-n="${i + 1}">
+      <h3 data-act="step" data-i="${i}">${esc(s.title)}</h3>
+      <div class="step-text">${fillVars(s.text, vars)}</div>
+      ${s.hint ? `<div class="step-hint">${esc(s.hint)}</div>` : ''}</div>`).join('')}</div>`;
+}
+
+/* Objections */
+function panelObjections(c){
+  const vars = scriptVars(c);
+  if (ui.editObj){
+    return `<div class="btn-row" style="justify-content:space-between;margin-bottom:14px">
+      <span class="small muted">Mode édition · enregistrement automatique. Les variables du script fonctionnent ici aussi.</span>
+      <div class="btn-row"><button class="btn sm ghost" data-act="resetObj">Restaurer les objections par défaut</button><button class="btn sm" data-act="addObj">${icon('plus')} Ajouter</button><button class="btn sm primary" data-act="editObj">${icon('check')} Terminer</button></div></div>
+      ${state.objections.map((o, i) => `<div class="card" style="margin-bottom:10px;padding:14px">
+        <div class="field" style="margin-bottom:8px"><label>Objection</label><input class="input" data-obj="${i}" data-of="q" value="${esc(o.q)}"></div>
+        <div class="field"><label>Réponse</label><textarea class="input" rows="7" data-obj="${i}" data-of="a">${esc(o.a)}</textarea></div>
+        <div style="margin-top:8px;text-align:right"><button class="btn sm ghost danger" data-act="delObj" data-i="${i}">Supprimer</button></div></div>`).join('')}`;
+  }
+  return `<div class="btn-row" style="margin-bottom:14px">
+      <div class="search" style="flex:1;position:relative">${icon('search','style="position:absolute;left:10px;top:9px;width:16px;height:16px;color:var(--text-3)"')}<input class="input" id="objSearch" placeholder="Rechercher une objection : prix, RGPD, secrétaire…" value="${esc(ui.objQ)}" style="padding-left:32px"></div>
+      <button class="btn sm ghost" data-act="editObj">${icon('edit')} Modifier</button></div>
+    <div id="objList">${objList(vars)}</div>`;
+}
+function objList(vars){
+  const q = norm(ui.objQ);
+  const list = state.objections.filter(o => !q || norm(o.q + ' ' + o.a).includes(q));
+  return list.map(o => `<details class="obj" ${q && list.length <= 3 ? 'open' : ''}><summary>${esc(o.q)}</summary><div class="obj-body">${fillVars(o.a, vars)}</div></details>`).join('')
+    || '<div class="empty">Aucune objection trouvée.</div>';
+}
+
+/* Calculateur */
+function calcInputs(c){
+  return ui.calcDraft[c.id] || (c.calc && c.calc.inputs ? {...c.calc.inputs} : calcDefaults(c));
+}
+function panelCalc(c){
+  const inp = calcInputs(c), s = state.settings, h = s.hyp;
+  const field = (k, l, suffix, step='1') => `<div class="field"><label for="calc_${k}">${l}</label><div style="position:relative"><input class="input num" id="calc_${k}" type="number" min="0" step="${step}" data-calc="${k}" value="${esc(inp[k])}" style="padding-right:46px"><span class="faint small" style="position:absolute;right:10px;top:8px">${suffix}</span></div></div>`;
+  const saved = c.calc && c.calc.savedAt;
+  return `<div class="calc-grid">
+    <div>
+      <div class="form-grid" style="grid-template-columns:1fr;gap:11px">
+        ${field('manquesJour','Appels manqués par jour','/ jour')}
+        ${field('valeurConsult','Valeur moyenne d’une consultation','€')}
+        ${field('tauxAbsence','Taux de rendez-vous non honorés','%','0.5')}
+        ${field('consultMois','Consultations par mois (cabinet)','/ mois')}
+        ${field('heuresAdmin','Heures administratives par semaine','h')}
+        ${field('coutHoraire','Coût horaire secrétariat ou médecin','€ / h')}
+        <div class="field"><label for="calc_prix">Prix mensuel de mon offre</label><div style="position:relative"><input class="input num" id="calc_prix" type="number" min="0" data-set="prix" value="${esc(s.prix)}" style="padding-right:46px"><span class="faint small" style="position:absolute;right:10px;top:8px">€ / mois</span></div></div>
+      </div>
+      <details class="hyp"><summary>Hypothèses de calcul</summary>
+        <div class="form-grid" style="margin-top:10px;gap:10px">
+          ${[['tauxRdvManques','Appels manqués = demande de RDV'],['tauxRecup','Appels récupérés par l’IA'],['reducAbsences','Baisse des absences (rappels)'],['tauxAutomatisation','Part de l’administratif automatisée']].map(([k,l]) =>
+            `<div class="field"><label>${l}</label><div style="position:relative"><input class="input num" type="number" min="0" max="100" data-hyp="${k}" value="${h[k]}" style="padding-right:28px"><span class="faint small" style="position:absolute;right:10px;top:8px">%</span></div></div>`).join('')}
+        </div>
+        <p class="small faint">Base : 21 jours ouvrés et 4,33 semaines par mois. Estimation indicative, à valider avec le cabinet.</p>
+      </details>
+    </div>
+    <div id="calcOut">${calcOutput(c)}</div>
+  </div>
+  <div class="btn-row" style="margin-top:16px;justify-content:flex-end">
+    ${saved ? `<span class="small faint" style="margin-right:auto">Enregistré dans la fiche le ${fmtDateTime(c.calc.savedAt)}</span>` : ''}
+    <button class="btn ghost sm" data-act="calcReset">Repartir de la qualification</button>
+    <button class="btn primary" data-act="calcSave">${icon('check')} Enregistrer dans la fiche</button>
+  </div>`;
+}
+function calcOutput(c){
+  const r = calcGains(calcInputs(c));
+  return `<div class="hero">
+      <div class="hero-label">Gain estimé pour ${esc(c.nom)}</div>
+      <div class="hero-value">${fmtEur(r.gainMois)}<span style="font-size:20px;color:var(--text-2);font-weight:500"> / mois</span></div>
+      <div class="hero-sub">soit <b style="color:var(--text)">${fmtEur(r.gainAn)}</b> par an</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><div class="v">${fmtNum(r.heures)} h</div><div class="l">heures récupérées par mois</div></div>
+      <div class="stat"><div class="v">${fmtNum(r.consults)}</div><div class="l">consultations récupérées par mois</div></div>
+      <div class="stat"><div class="v">${r.prix ? '×' + fmtNum(r.multiple, 1) : '—'}</div><div class="l">gain / prix de l’offre (${fmtEur(r.prix)}/mois)</div></div>
+      <div class="stat"><div class="v">${r.payback != null && r.prix ? (r.payback < 1 ? '< 1' : fmtNum(r.payback)) + ' j' : '—'}</div><div class="l">pour rentabiliser l’abonnement</div></div>
+    </div>
+    <p class="small muted" style="margin:12px 0 0">Retour sur investissement : <b style="color:var(--text)">${r.prix ? (r.roi >= 0 ? '+' : '') + fmtNum(r.roi) + ' %' : '—'}</b> · gain net ${fmtEur(r.net)} / mois.<br>
+    Détail : ${fmtNum(r.consultsManques, 1)} consultations via les appels récupérés, ${fmtNum(r.consultsAbsences, 1)} via les absences évitées.</p>`;
+}
+
+/* Historique */
+function panelHistory(c){
+  const list = callsOf(c.id);
+  const calc = c.calc && c.calc.result;
+  return `${calc ? `<div class="stat" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+      <div><div class="l">Calcul de gains enregistré</div><div class="v" style="font-size:18px">${fmtEur(calc.gainMois)} / mois · ${fmtNum(calc.heures)} h · ${fmtNum(calc.consults)} consultations</div></div>
+      <span class="small faint">${fmtDateTime(c.calc.savedAt)}</span></div>` : ''}
+    <div class="list">${list.map(k => `<div class="row-item" style="align-items:flex-start">
+      <div style="width:120px;flex:none" class="small muted num">${fmtDateTime(k.date)}</div>
+      <div class="row-main"><div><span class="tag" style="${k.resultat === 'demo' ? 'background:var(--ok-soft);color:var(--ok)' : k.resultat === 'refus' ? 'background:var(--st-perdu-bg);color:var(--st-perdu)' : ''}">${resLabel(k.resultat)}</span> <span class="small faint">${fmtDur(k.duree)}</span></div>
+        ${k.note ? `<div style="margin-top:4px;white-space:pre-wrap">${esc(k.note)}</div>` : ''}</div>
+      <button class="btn sm ghost icon" data-act="delCall" data-id="${k.id}" title="Supprimer cet appel">${icon('x')}</button></div>`).join('') || '<div class="empty">Aucun appel pour l’instant.</div>'}</div>`;
+}
+
+/* Prochaine action */
+function panelNext(c){
+  const n = c.next || {type:'appel', date: ymd(addDays(new Date(), 1)), time:'12:30', note:''};
+  return `<form id="nextForm">
+    <div class="form-grid">
+      <div class="field full"><span class="label">Type</span><div class="seg" id="nextType">${TYPES_ACTION.map(t => `<button type="button" class="${n.type === t.k ? 'on' : ''}" data-act="segPick" data-k="${t.k}">${t.l}</button>`).join('')}</div></div>
+      <div class="field"><label for="n_date">Date</label><input class="input" type="date" id="n_date" value="${esc(n.date)}" required></div>
+      <div class="field"><label for="n_time">Heure</label><input class="input" type="time" id="n_time" value="${esc(n.time)}"></div>
+      <div class="field full"><label for="n_note">Note</label><input class="input" id="n_note" value="${esc(n.note || '')}" placeholder="Ex. rappeler le Dr après ses consultations"></div>
+      <div class="full chips">${[['Demain 12 h 30',1,'12:30'],['Demain 18 h 15',1,'18:15'],['Dans 3 jours',3,'12:30'],['Dans une semaine',7,'12:30']].map(([l,d,t]) => `<button type="button" class="chip" data-act="quickNext" data-d="${d}" data-t="${t}">${l}</button>`).join('')}</div>
+    </div>
+    <div class="btn-row" style="justify-content:flex-end;margin-top:16px">
+      ${c.next ? `<button type="button" class="btn ghost" data-act="clearNext">Marquer comme fait</button>` : ''}
+      <button type="submit" class="btn primary">Enregistrer la prochaine action</button>
+    </div></form>
+    ${c.next ? `<p class="small muted" style="margin-top:14px">Actuellement prévu : ${nextLabel(c.next)}</p>` : '<p class="small faint" style="margin-top:14px">Aucune action planifiée.</p>'}`;
+}
+
+/* Chronomètre */
+function resetTimer(id){ clearInterval(ui.timer.int); ui.timer = {cabinetId:id, start:null, elapsed:0, int:null}; }
+function currentElapsed(){ return ui.timer.elapsed + (ui.timer.start ? Math.floor((Date.now() - ui.timer.start) / 1000) : 0); }
+const fmtTimer = s => `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
+function startTimer(){
+  if (ui.timer.start) return;
+  ui.timer.start = Date.now();
+  ui.timer.int = setInterval(() => { const el = $('#timerVal'); if (el) el.textContent = fmtTimer(currentElapsed()); }, 1000);
+  updateTimerUI();
+}
+function stopTimer(){
+  if (!ui.timer.start) return;
+  ui.timer.elapsed = currentElapsed(); ui.timer.start = null; clearInterval(ui.timer.int);
+  updateTimerUI();
+}
+function updateTimerUI(){
+  const t = $('#timer'); if (!t) return;
+  t.classList.toggle('running', !!ui.timer.start);
+  $('#timerVal').textContent = fmtTimer(currentElapsed());
+  const b = $('#timerBtn');
+  b.className = 'btn ' + (ui.timer.start ? '' : 'primary');
+  b.innerHTML = ui.timer.start ? icon('stop') + ' Arrêter l’appel' : icon('play') + ' Démarrer l’appel';
+}
+function afterCallRender(){ if (ui.timer.start) updateTimerUI(); }
+
+/* Fenêtre de résultat */
+function openResult(c, res){
+  stopTimer();
+  const duree = currentElapsed();
+  const sug = suggestAfter(c, res);
+  const n = sug.next;
+  openModal(`<form id="resForm">
+    <div class="modal-head"><div><h2>${esc(resLabel(res))}</h2><p>${esc(c.nom)} · durée ${fmtDur(duree)}</p></div>
+      <button type="button" class="btn ghost icon" data-act="closeModal" aria-label="Fermer">${icon('x')}</button></div>
+    <div class="modal-body"><div class="form-grid">
+      <div class="field full"><label for="r_note">Note</label><textarea class="input" id="r_note" rows="3" placeholder="Ce qu’il faut retenir de l’appel (facultatif)"></textarea></div>
+      <div class="field full"><label for="r_statut">Statut</label><select class="input" id="r_statut">${opts(STATUTS, sug.statut)}</select></div>
+      <div class="field full"><label class="small" style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" id="r_plan" ${n ? 'checked' : ''}> Planifier une prochaine action</label></div>
+      <div class="field full" data-plan><span class="label">Type</span><div class="seg" id="r_type">${TYPES_ACTION.map(t => `<button type="button" class="${(n ? n.type : 'appel') === t.k ? 'on' : ''}" data-act="segPick" data-k="${t.k}">${t.l}</button>`).join('')}</div></div>
+      <div class="field" data-plan><label for="r_date">Date</label><input class="input" type="date" id="r_date" value="${n ? n.date : ymd(addDays(new Date(), 1))}"></div>
+      <div class="field" data-plan><label for="r_time">Heure</label><input class="input" type="time" id="r_time" value="${n ? n.time : '12:30'}"></div>
+    </div></div>
+    <div class="modal-foot"><span class="hint">Ctrl + Entrée : enregistrer et suivant</span>
+      <button type="button" class="btn" data-act="saveResult" data-next="0">Enregistrer</button>
+      <button type="submit" class="btn primary" id="saveNextBtn">Enregistrer et passer au suivant ${icon('arrowR')}</button>
+    </div></form>`);
+  const togglePlan = () => $$('[data-plan]').forEach(el => el.style.opacity = $('#r_plan').checked ? 1 : .4);
+  $('#r_plan').onchange = togglePlan; togglePlan();
+  $('#resForm').dataset.res = res; $('#resForm').dataset.cid = c.id; $('#resForm').dataset.duree = duree;
+  $('#resForm').onsubmit = e => { e.preventDefault(); commitResult(true); };
+  $('#r_note').focus();
+}
+function commitResult(goNext){
+  const f = $('#resForm'); if (!f) return;
+  const c = cab(f.dataset.cid);
+  const now = new Date();
+  state.calls.push({id:uid(), cabinetId:c.id, date:now.toISOString(), duree:+f.dataset.duree || 0, resultat:f.dataset.res, note:$('#r_note').value.trim()});
+  c.lastCall = now.toISOString();
+  c.statut = $('#r_statut').value;
+  if ($('#r_plan').checked && $('#r_date').value){
+    const type = $('#r_type .on').dataset.k;
+    c.next = {type, date:$('#r_date').value, time:$('#r_time').value, note: $('#r_note').value.trim().slice(0, 80) || (type === 'demo' ? 'Démo 20 min' : type === 'email' ? 'Envoyer un email' : 'Relance')};
+  } else c.next = null;
+  delete ui.calcDraft[c.id];
+  save(); closeModal(); resetTimer(null);
+  if (goNext){
+    const q = callQueue().filter(x => x.c.id !== c.id);
+    if (q.length){ toast(`Enregistré · ${q[0].c.nom}`); location.hash = '#/cabinet/' + q[0].c.id; }
+    else { toast('Enregistré · file d’appels terminée'); location.hash = '#/'; }
+  } else { toast('Appel enregistré'); resetTimer(c.id); render(); }
+}
+</script>
+<script>
+/* ==========================================================================
+   Pipeline
+   ========================================================================== */
+function viewPipeline(){
+  return `<div class="page wide">
+    <div class="page-head"><div><h1>Pipeline</h1><p>Glissez une carte d’une colonne à l’autre pour changer son statut.</p></div>
+      <button class="btn" data-act="newCabinet">${icon('plus')} Ajouter un cabinet</button></div>
+    <div class="kanban">${STATUTS.map(s => {
+      const list = state.cabinets.filter(c => c.statut === s.k).sort((a,b) => a.priorite - b.priorite || norm(a.nom).localeCompare(norm(b.nom)));
+      return `<div class="kcol" data-col="${s.k}">
+        <div class="kcol-head"><span style="display:flex;align-items:center;gap:7px"><span style="width:8px;height:8px;border-radius:50%;background:var(--st-${s.k})"></span>${s.l}</span><span class="n">${list.length}</span></div>
+        ${list.map(c => `<div class="kcard" draggable="true" data-id="${c.id}">
+          <div class="t">${esc(c.nom)}</div><div class="s">${esc(c.specialite)} · ${esc(c.ville)}</div>
+          <div class="f">${prio(c.priorite)}${c.next ? nextLabel(c.next) : ''}</div>
+          <select class="input" data-move="${c.id}" aria-label="Changer le statut">${opts(STATUTS, c.statut)}</select>
+        </div>`).join('')}
+      </div>`;
+    }).join('')}</div></div>`;
+}
+function bindKanban(){
+  let dragId = null, moved = false;
+  $$('.kcard').forEach(card => {
+    card.addEventListener('dragstart', e => { dragId = card.dataset.id; moved = true; card.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId); });
+    card.addEventListener('dragend', () => { card.classList.remove('dragging'); setTimeout(() => moved = false, 50); });
+    card.addEventListener('click', e => { if (moved || e.target.closest('select')) return; location.hash = '#/cabinet/' + card.dataset.id; });
+  });
+  $$('.kcol').forEach(col => {
+    col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('over'); });
+    col.addEventListener('dragleave', e => { if (!col.contains(e.relatedTarget)) col.classList.remove('over'); });
+    col.addEventListener('drop', e => {
+      e.preventDefault(); col.classList.remove('over');
+      const c = cab(e.dataTransfer.getData('text/plain') || dragId);
+      if (c && c.statut !== col.dataset.col){ c.statut = col.dataset.col; save(); toast(`${c.nom} → ${statutLabel(c.statut)}`); render(); }
+    });
+  });
+}
+
+/* ==========================================================================
+   Agenda des relances
+   ========================================================================== */
+function viewAgenda(){
+  const t = todayStr(), tm = ymd(addDays(new Date(), 1));
+  const endWeek = ymd(addDays(startOfWeek(), 6));
+  const groups = [['En retard',[]],['Aujourd’hui',[]],['Demain',[]],['Cette semaine',[]],['Plus tard',[]]];
+  for (const x of followUps()){
+    const d = x.n.date;
+    groups[d < t ? 0 : d === t ? 1 : d === tm ? 2 : d <= endWeek ? 3 : 4][1].push(x);
+  }
+  const total = groups.reduce((s, g) => s + g[1].length, 0);
+  return `<div class="page" style="max-width:920px">
+    <div class="page-head"><div><h1>Relances et démos</h1><p>${total} action${total > 1 ? 's' : ''} planifiée${total > 1 ? 's' : ''}</p></div></div>
+    ${groups.map(([title, items], gi) => items.length ? `<div class="agenda-group">
+      <h2 style="${gi === 0 ? 'color:var(--danger)' : ''}">${title} <span class="n">${items.length}</span></h2>
+      ${items.map(({c, n}) => `<div class="ag-item">
+        <div class="ag-when"><b>${n.time ? n.time.replace(':','h') : '—'}</b><span>${gi <= 2 ? relDay(n.date) : fmtDate(n.date)}</span></div>
+        ${typeIcon(n.type)}
+        <div class="row-main"><div class="row-title"><a href="#/cabinet/${c.id}">${esc(c.nom)}</a></div>
+          <div class="row-sub">${typeLabel(n.type)}${c.decideur ? ' · ' + esc(c.decideur) : ''}${n.note ? ' · ' + esc(n.note) : ''}</div></div>
+        <span class="hide-sm">${pill(c.statut)}</span>
+        <button class="btn sm ghost" data-act="agendaDone" data-id="${c.id}" title="Marquer comme fait">${icon('check')}</button>
+        <a class="btn sm" href="#/cabinet/${c.id}">${icon(n.type === 'email' ? 'mail' : 'phone')}<span class="lbl">${n.type === 'email' ? 'Ouvrir' : 'Appeler'}</span></a>
+      </div>`).join('')}</div>` : '').join('') || '<div class="card empty">Aucune relance planifiée. Elles apparaissent ici dès que vous enregistrez un appel avec une prochaine action.</div>'}
+  </div>`;
+}
+
+/* ==========================================================================
+   Statistiques
+   ========================================================================== */
+function hbars(rows, opt={}){
+  const max = Math.max(1, ...rows.map(r => r.v));
+  return rows.map(r => `<div class="hbar" data-tip="${esc(r.tip || `${r.l} : ${r.v}`)}"><span class="lbl" title="${esc(r.l)}">${esc(r.l)}</span>
+    <span class="track"><span class="fill" style="width:${(opt.scale100 ? r.v : r.v / max * 100)}%;${r.hi ? 'background:var(--series-2)' : ''}"></span></span>
+    <span class="val">${r.display ?? r.v}</span></div>`).join('') || '<div class="empty">Pas encore de données.</div>';
+}
+function viewStats(){
+  const calls = periodCalls(ui.period);
+  const touchedIds = new Set(calls.map(k => k.cabinetId));
+  const touched = ui.period === 'all' ? state.cabinets : state.cabinets.filter(c => touchedIds.has(c.id));
+  const dec = calls.filter(k => DECROCHE.has(k.resultat));
+  const decid = calls.filter(k => DECIDEUR.has(k.resultat));
+  const demos = calls.filter(k => k.resultat === 'demo');
+  const interested = touched.filter(c => STATUT_RANK[c.statut] >= STATUT_RANK.interesse && c.statut !== 'perdu' || calls.some(k => k.cabinetId === c.id && ['argumente','demo'].includes(k.resultat)) && c.statut !== 'perdu');
+  const props = touched.filter(c => ['proposition','signe'].includes(c.statut));
+  const signed = touched.filter(c => c.statut === 'signe');
+  const funnel = [['Appels', calls.length],['Décrochés', dec.length],['Décideurs atteints', decid.length],['Intéressés', interested.length],['Démos', demos.length],['Propositions', props.length],['Signés', signed.length]];
+  const funnelRows = funnel.map(([l, v], i) => ({l, v, display: `${v}${i ? ` <small>${pct(v, funnel[i-1][1])} %</small>` : ''}`, tip: i ? `${l} : ${v} (${pct(v, funnel[i-1][1])} % de l’étape précédente)` : `${l} : ${v}`}));
+
+  const resRows = RESULTATS.map(r => { const v = calls.filter(k => k.resultat === r.k).length; return {l:r.l, v, display:`${v} <small>${pct(v, calls.length)} %</small>`}; });
+
+  const bySpe = SPECIALITES.map(s => {
+    const ids = new Set(calls.filter(k => cab(k.cabinetId)?.specialite === s).map(k => k.cabinetId));
+    const withDemo = [...ids].filter(id => calls.some(k => k.cabinetId === id && k.resultat === 'demo')).length;
+    return {l: s === 'Maison de santé pluriprofessionnelle' ? 'Maisons de santé' : s, v: pct(withDemo, ids.size), n: ids.size, d: withDemo};
+  }).filter(r => r.n).sort((a,b) => b.v - a.v).map(r => ({...r, display:`${r.v} %`, tip:`${r.l} : ${r.d} démo(s) sur ${r.n} cabinet(s) appelé(s)`}));
+
+  const irrRows = IRRITANTS.map(i => ({l:i.l, v: touched.filter(c => c.qualif && c.qualif.irritant === i.k).length})).sort((a,b) => b.v - a.v);
+  const useRows = USAGES.map(u => ({l:u.l, v: touched.filter(c => c.qualif && (c.qualif.usages || []).includes(u.k)).length})).sort((a,b) => b.v - a.v);
+
+  const slots = [];
+  for (let h = 8; h <= 19; h++){
+    const cs = calls.filter(k => new Date(k.date).getHours() === h);
+    const d = cs.filter(k => DECROCHE.has(k.resultat)).length;
+    slots.push({l:`${h} h – ${h + 1} h`, v: pct(d, cs.length), n: cs.length, d});
+  }
+  const withCalls = slots.filter(s => s.n);
+  const best = [...withCalls].filter(s => s.n >= 2).sort((a,b) => b.v - a.v).slice(0, 3).map(s => s.l);
+  const slotRows = withCalls.map(s => ({...s, hi: best.includes(s.l), display:`${s.v} %`, tip:`${s.l} : ${s.d} décroché(s) sur ${s.n} appel(s)`}));
+
+  const totalDur = calls.reduce((s, k) => s + (k.duree || 0), 0);
+  return `<div class="page">
+    <div class="page-head"><div><h1>Statistiques</h1><p>${calls.length} appels · ${touched.length} cabinets concernés · ${fmtNum(totalDur / 3600, 1)} h au téléphone</p></div>
+      <div class="seg">${[['7','7 jours'],['30','30 jours'],['all','Tout']].map(([k,l]) => `<button class="${ui.period === k ? 'on' : ''}" data-act="period" data-k="${k}">${l}</button>`).join('')}</div></div>
+    <div class="grid g-2" style="margin-bottom:16px">
+      <div class="card funnel"><div class="card-head"><h2>Entonnoir</h2><span class="small faint">% par rapport à l’étape précédente</span></div>${hbars(funnelRows)}</div>
+      <div class="card"><div class="card-head"><h2>Résultats des appels</h2></div>${hbars(resRows)}</div>
+    </div>
+    <div class="grid g-2" style="margin-bottom:16px">
+      <div class="card"><div class="card-head"><h2>Taux de démo par spécialité</h2><span class="small faint">cabinets avec démo / appelés</span></div>${hbars(bySpe, {scale100:true})}</div>
+      <div class="card"><div class="card-head"><h2>Meilleurs créneaux pour joindre les cabinets</h2><span class="small faint">taux de décroché</span></div>
+        ${best.length ? `<p class="small muted" style="margin:-4px 0 10px">À privilégier : <b style="color:var(--text)">${best.join(', ')}</b></p>` : ''}${hbars(slotRows, {scale100:true})}</div>
+    </div>
+    <div class="grid g-2">
+      <div class="card"><div class="card-head"><h2>Irritants les plus fréquents</h2></div>${hbars(irrRows)}</div>
+      <div class="card"><div class="card-head"><h2>Cas d’usage les plus demandés</h2></div>${hbars(useRows)}</div>
+    </div>
+  </div>`;
+}
+
+/* ==========================================================================
+   Paramètres
+   ========================================================================== */
+function viewSettings(){
+  const s = state.settings;
+  const f = (k, l, type='text', extra='') => `<div class="field"><label for="s_${k}">${l}</label><input class="input" id="s_${k}" type="${type}" data-set="${k}" value="${esc(s[k])}" ${extra}></div>`;
+  const nSample = state.cabinets.filter(c => c.sample).length;
+  return `<div class="page" style="max-width:860px">
+    <div class="page-head"><div><h1>Paramètres</h1><p>Ces informations alimentent le script d’appel et le calculateur. Enregistrement automatique.</p></div></div>
+    <div class="card" style="margin-bottom:16px"><div class="card-head"><h2>Mon offre</h2></div>
+      <div class="form-grid">
+        ${f('prenom','Mon prénom')}
+        ${f('societe','Ma société')}
+        <div class="field full"><label for="s_offre">Mon offre en une phrase <span class="faint">· {offre}</span></label><textarea class="input" id="s_offre" rows="2" data-set="offre">${esc(s.offre)}</textarea></div>
+        <div class="field full"><label for="s_benefice">Mon bénéfice clé <span class="faint">· {benefice}</span></label><textarea class="input" id="s_benefice" rows="2" data-set="benefice">${esc(s.benefice)}</textarea></div>
+        ${f('beneficeCourt','Bénéfice en quelques mots · {benefice_court}')}
+        ${f('prix','Prix mensuel de mon offre (€)','number','min="0"')}
+      </div></div>
+    <div class="card" style="margin-bottom:16px"><div class="card-head"><h2>Objectifs</h2></div>
+      <div class="form-grid">${f('objAppels','Appels par jour','number','min="1"')}${f('objDemos','Démos par semaine','number','min="1"')}</div></div>
+    <div class="card" style="margin-bottom:16px"><div class="card-head"><h2>Données</h2></div>
+      <div class="list">
+        <div class="row-item"><div class="row-main"><div class="row-title">Importer des cabinets (CSV)</div>
+          <div class="row-sub" style="white-space:normal">Séparateur ; ou , détecté automatiquement. Colonnes reconnues : nom, specialite, praticiens, secretaires, adresse, cp, ville, telephone, email, interlocuteur, role, decideur, logiciel, externalise, priorite, statut, notes.</div></div>
+          <label class="btn">Choisir un fichier<input type="file" accept=".csv,text/csv" id="csvFile" hidden></label></div>
+        <div class="row-item"><div class="row-main"><div class="row-title">Exporter les cabinets (CSV)</div><div class="row-sub">${state.cabinets.length} cabinets, qualification et prochaine action incluses.</div></div>
+          <button class="btn" data-act="exportCsv">Exporter</button></div>
+        <div class="row-item"><div class="row-main"><div class="row-title">Supprimer les données d’exemple</div><div class="row-sub">${nSample} cabinet${nSample > 1 ? 's' : ''} fictif${nSample > 1 ? 's' : ''} et leur historique d’appels. Vos cabinets sont conservés.</div></div>
+          <button class="btn danger" data-act="deleteSample" ${nSample ? '' : 'disabled'}>Supprimer</button></div>
+        <div class="row-item"><div class="row-main"><div class="row-title">Réinitialiser l’application</div><div class="row-sub">Efface tout et recharge les données d’exemple, le script et les objections par défaut.</div></div>
+          <button class="btn danger" data-act="resetAll">Réinitialiser</button></div>
+      </div></div>
+    <p class="small faint">Les données sont stockées dans ce navigateur (stockage local). Pensez à exporter régulièrement. Le script et les objections se modifient depuis la fiche d’un cabinet, onglets Script et Objections.</p>
+  </div>`;
+}
+
+/* CSV */
+function parseCSV(text){
+  text = text.replace(/^﻿/, '');
+  const firstLine = text.split(/\r?\n/)[0] || '';
+  const sep = (firstLine.match(/;/g) || []).length >= (firstLine.match(/,/g) || []).length ? ';' : ',';
+  const rows = []; let row = [], cur = '', q = false;
+  for (let i = 0; i < text.length; i++){
+    const ch = text[i];
+    if (q){
+      if (ch === '"'){ if (text[i+1] === '"'){ cur += '"'; i++; } else q = false; }
+      else cur += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === sep){ row.push(cur); cur = ''; }
+    else if (ch === '\n' || ch === '\r'){ if (ch === '\r' && text[i+1] === '\n') i++; row.push(cur); rows.push(row); row = []; cur = ''; }
+    else cur += ch;
+  }
+  if (cur || row.length){ row.push(cur); rows.push(row); }
+  return {sep, rows: rows.filter(r => r.some(x => x.trim()))};
+}
+const CSV_ALIASES = {
+  nom:['nom','nom du cabinet','cabinet','raison sociale','name'], specialite:['specialite','specialty'], praticiens:['praticiens','nombre de praticiens','nb praticiens','medecins'],
+  secretaires:['secretaires','nombre de secretaires','nb secretaires'], adresse:['adresse','address','rue'], cp:['cp','code postal','code_postal'], ville:['ville','city','commune'],
+  tel:['telephone','tel','téléphone','phone','numero'], email:['email','mail','e-mail','courriel'], interlocuteur:['interlocuteur','contact'], role:['role','fonction'],
+  decideur:['decideur','décideur'], logiciel:['logiciel','logiciel metier','logiciel métier'], externalise:['externalise','secretariat externalise','externalisé'],
+  priorite:['priorite','priority'], statut:['statut','status'], notes:['notes','note','commentaire','commentaires'],
+};
+function importCSV(text){
+  const {sep, rows} = parseCSV(text);
+  if (rows.length < 2){ toast('Fichier vide ou illisible'); return; }
+  const head = rows[0].map(h => norm(h));
+  const idx = {};
+  for (const [k, al] of Object.entries(CSV_ALIASES)){ const i = head.findIndex(h => al.map(norm).includes(h)); if (i >= 0) idx[k] = i; }
+  if (idx.nom == null){ toast('Colonne « nom » introuvable'); return; }
+  let n = 0;
+  for (const r of rows.slice(1)){
+    const g = k => idx[k] != null ? (r[idx[k]] || '').trim() : '';
+    if (!g('nom')) continue;
+    const c = newCabinet();
+    c.nom = g('nom');
+    const spe = SPECIALITES.find(s => norm(s) === norm(g('specialite'))) || SPECIALITES.find(s => g('specialite') && norm(s).startsWith(norm(g('specialite')).slice(0, 5)));
+    if (spe) c.specialite = spe;
+    c.praticiens = Math.max(1, parseInt(g('praticiens')) || 1);
+    c.secretaires = Math.max(0, parseInt(g('secretaires')) || 0);
+    ['adresse','cp','ville','tel','email','interlocuteur','decideur','notes'].forEach(k => { if (g(k)) c[k] = g(k); });
+    const role = ROLES.find(x => norm(x) === norm(g('role'))); if (role) c.role = role;
+    const log = LOGICIELS.find(x => norm(x) === norm(g('logiciel'))); if (log) c.logiciel = log; else if (g('logiciel')) c.logiciel = 'Autre';
+    c.externalise = /^(oui|o|yes|y|1|true|vrai)$/i.test(g('externalise'));
+    const p = parseInt(g('priorite')); if (p >= 1 && p <= 3) c.priorite = p;
+    const st = STATUTS.find(s => norm(s.l) === norm(g('statut')) || s.k === norm(g('statut'))); if (st) c.statut = st.k;
+    state.cabinets.push(c); n++;
+  }
+  save(); toast(`${n} cabinet${n > 1 ? 's' : ''} importé${n > 1 ? 's' : ''} (séparateur « ${sep} »)`); render();
+}
+function exportCSV(){
+  const cols = [['nom','Nom'],['specialite','Spécialité'],['praticiens','Praticiens'],['secretaires','Secrétaires'],['adresse','Adresse'],['cp','Code postal'],['ville','Ville'],['tel','Téléphone'],['email','Email'],['interlocuteur','Interlocuteur'],['role','Rôle'],['decideur','Décideur'],['logiciel','Logiciel'],['externalise','Externalisé'],['priorite','Priorité'],['statut','Statut'],['notes','Notes']];
+  const qcols = [['appelsJour','Appels par jour'],['partManques','Appels manqués (%)'],['heuresSecretariat','Heures secrétariat / sem.'],['heuresAdmin','Heures admin / sem.'],['irritant','Irritant'],['usages','Cas d’usage'],['decideurIdentifie','Décideur identifié'],['budget','Budget'],['echeance','Échéance'],['ouverture','Ouverture IA']];
+  const cell = v => { const s = String(v ?? ''); return /[;"\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const lines = [[...cols.map(c => c[1]), ...qcols.map(c => c[1]), 'Gain mensuel estimé', 'Dernier appel', 'Prochaine action', 'Date prochaine action'].map(cell).join(';')];
+  for (const c of state.cabinets){
+    const q = c.qualif || {};
+    lines.push([
+      ...cols.map(([k]) => k === 'externalise' ? (c[k] ? 'oui' : 'non') : k === 'statut' ? statutLabel(c[k]) : c[k]),
+      ...qcols.map(([k]) => k === 'irritant' ? (q[k] ? irrLabel(q[k]) : '') : k === 'usages' ? (q[k] || []).map(usageLabel).join(', ') : k === 'decideurIdentifie' ? (q[k] ? 'oui' : 'non') : k === 'ouverture' ? ((OUVERTURES.find(o => o.k === q[k]) || {}).l || '') : q[k]),
+      c.calc && c.calc.result ? Math.round(c.calc.result.gainMois) : '',
+      c.lastCall ? ymd(new Date(c.lastCall)) : '',
+      c.next ? typeLabel(c.next.type) : '', c.next ? `${c.next.date} ${c.next.time || ''}`.trim() : '',
+    ].map(cell).join(';'));
+  }
+  const blob = new Blob(['﻿' + lines.join('\r\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = `cabinets-${todayStr()}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast('Export CSV téléchargé');
+}
+
+/* ==========================================================================
+   Modale, toast, infobulle, thème
+   ========================================================================== */
+function openModal(html, size=''){
+  $('#modal').innerHTML = `<div class="overlay" data-overlay><div class="modal ${size}" role="dialog" aria-modal="true">${html}</div></div>`;
+}
+function closeModal(){ $('#modal').innerHTML = ''; }
+const isModalOpen = () => !!$('#modal .overlay');
+let toastT;
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200); }
+function confirmBox(title, text, okLabel, onOk){
+  openModal(`<div class="modal-head"><div><h2>${esc(title)}</h2><p>${esc(text)}</p></div></div>
+    <div class="modal-foot"><button class="btn" data-act="closeModal">Annuler</button><button class="btn primary" id="confirmOk">${esc(okLabel)}</button></div>`);
+  $('#confirmOk').onclick = () => { closeModal(); onOk(); };
+  $('#confirmOk').focus();
+}
+function showTip(el, e){ const t = $('#tooltip'); t.textContent = el.dataset.tip; t.classList.add('show'); moveTip(e); }
+function moveTip(e){ const t = $('#tooltip'); const w = t.offsetWidth; t.style.left = Math.min(window.innerWidth - w - 8, Math.max(8, e.clientX - w / 2)) + 'px'; t.style.top = (e.clientY - 40) + 'px'; }
+function hideTip(){ const t = $('#tooltip'); if (t) t.classList.remove('show'); }
+function applyTheme(t){
+  if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;
+}
+function toggleTheme(){
+  const cur = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+  renderShell();
+}
+</script>
+<script>
+/* ==========================================================================
+   Événements
+   ========================================================================== */
+const currentCab = () => { const r = route(); return r.name === 'cabinet' ? cab(r.arg) : null; };
+
+const actions = {
+  drawer(){
+    const d = $('#drawer');
+    if (d.innerHTML){ d.innerHTML = ''; return; }
+    d.innerHTML = `<div class="drawer" data-drawer><aside class="sidebar">${$('#sidebar').innerHTML}</aside></div>`;
+  },
+  theme(){ toggleTheme(); },
+  newCabinet(){ cabinetForm(newCabinet(), true); },
+  editCabinet(el){ const c = cab(el.dataset.id); if (c) cabinetForm(c, false); },
+  deleteCabinet(el){
+    const c = cab(el.dataset.id);
+    confirmBox('Supprimer ce cabinet ?', `${c.nom} et son historique d’appels seront supprimés définitivement.`, 'Supprimer', () => {
+      state.cabinets = state.cabinets.filter(x => x.id !== c.id);
+      state.calls = state.calls.filter(k => k.cabinetId !== c.id);
+      save(); toast('Cabinet supprimé'); location.hash = '#/cabinets'; render();
+    });
+  },
+  closeModal(){ closeModal(); },
+  clearFilters(){ ui.filters = {q:'', statut:'', specialite:'', ville:'', priorite:''}; render(); },
+  sort(el){ const k = el.dataset.k; ui.sort = {key:k, dir: ui.sort.key === k ? -ui.sort.dir : 1}; $('#cabTable').innerHTML = cabTable(); },
+  open(el){ location.hash = '#/cabinet/' + el.dataset.id; },
+  dial(){ startTimer(); return true; },
+  timer(){ ui.timer.start ? stopTimer() : startTimer(); },
+  result(el){ const c = currentCab(); if (c) openResult(c, el.dataset.res); },
+  saveResult(){ commitResult(false); },
+  tab(el){ ui.tab = el.dataset.tab; $$('.tabs button').forEach(b => b.classList.toggle('on', b === el)); refreshRight(); },
+  irritant(el){ const c = currentCab(); c.qualif.irritant = c.qualif.irritant === el.dataset.k ? '' : el.dataset.k; markChips(el, 'single'); save(); refreshRight(); },
+  usage(el){ const c = currentCab(); const u = c.qualif.usages; const k = el.dataset.k; c.qualif.usages = u.includes(k) ? u.filter(x => x !== k) : [...u, k]; el.classList.toggle('on'); save(); },
+  decId(el){ const c = currentCab(); c.qualif.decideurIdentifie = el.dataset.k === '1'; segOn(el); save(); },
+  ouverture(el){ const c = currentCab(); c.qualif.ouverture = c.qualif.ouverture === el.dataset.k ? '' : el.dataset.k; el.classList.contains('on') ? el.classList.remove('on') : segOn(el); save(); },
+  segPick(el){ segOn(el); },
+  editScript(){ ui.editScript = !ui.editScript; refreshRight(); },
+  resetScript(){ confirmBox('Restaurer le script par défaut ?', 'Vos modifications du script seront perdues.', 'Restaurer', () => { state.script = {steps: structuredClone(DEFAULT_SCRIPT), valueProps: structuredClone(DEFAULT_VALUE_PROPS)}; save(); refreshRight(); }); },
+  step(el){ ui.activeStep = +el.dataset.i; refreshRight(); },
+  editObj(){ ui.editObj = !ui.editObj; refreshRight(); },
+  resetObj(){ confirmBox('Restaurer les objections par défaut ?', 'Vos modifications des objections seront perdues.', 'Restaurer', () => { state.objections = structuredClone(DEFAULT_OBJECTIONS); save(); refreshRight(); }); },
+  addObj(){ state.objections.unshift({id:uid(), q:'Nouvelle objection', a:''}); save(); refreshRight(); },
+  delObj(el){ state.objections.splice(+el.dataset.i, 1); save(); refreshRight(); },
+  calcSave(){
+    const c = currentCab(); const inputs = calcInputs(c);
+    c.calc = {inputs:{...inputs}, result: calcGains(inputs), savedAt: new Date().toISOString()};
+    delete ui.calcDraft[c.id]; save(); toast(`Gain enregistré : ${fmtEur(c.calc.result.gainMois)} / mois`); refreshRight();
+  },
+  calcReset(){ const c = currentCab(); delete ui.calcDraft[c.id]; ui.calcDraft[c.id] = calcDefaults(c); refreshRight(); },
+  delCall(el){
+    const c = currentCab();
+    state.calls = state.calls.filter(k => k.id !== el.dataset.id);
+    const last = callsOf(c.id)[0]; c.lastCall = last ? last.date : null;
+    save(); refreshRight();
+  },
+  quickNext(el){ $('#n_date').value = ymd(addDays(new Date(), +el.dataset.d)); $('#n_time').value = el.dataset.t; },
+  clearNext(){ const c = currentCab(); c.next = null; save(); toast('Action marquée comme faite'); render(); },
+  agendaDone(el){ const c = cab(el.dataset.id); c.next = null; save(); toast('Action marquée comme faite'); render(); },
+  period(el){ ui.period = el.dataset.k; render(); },
+  exportCsv(){ exportCSV(); },
+  deleteSample(){
+    confirmBox('Supprimer les données d’exemple ?', 'Les cabinets fictifs et leur historique seront supprimés. Vos propres cabinets sont conservés.', 'Supprimer', () => {
+      const ids = new Set(state.cabinets.filter(c => c.sample).map(c => c.id));
+      state.cabinets = state.cabinets.filter(c => !ids.has(c.id));
+      state.calls = state.calls.filter(k => !ids.has(k.cabinetId));
+      save(); toast('Données d’exemple supprimées'); render();
+    });
+  },
+  resetAll(){
+    confirmBox('Réinitialiser l’application ?', 'Toutes vos données seront effacées et remplacées par les données d’exemple.', 'Réinitialiser', () => {
+      state = freshState(); persist(); toast('Application réinitialisée'); location.hash = '#/'; render();
+    });
+  },
+};
+function segOn(el){ $$('button', el.parentElement).forEach(b => b.classList.toggle('on', b === el)); }
+function markChips(el){ const on = !el.classList.contains('on'); $$('.chip', el.parentElement).forEach(b => b.classList.remove('on')); if (on) el.classList.add('on'); }
+
+document.addEventListener('click', e => {
+  if (e.target.matches('[data-overlay]')){ closeModal(); return; }
+  if (e.target.matches('[data-drawer]')){ $('#drawer').innerHTML = ''; return; }
+  if (e.target.closest('#drawer a')){ $('#drawer').innerHTML = ''; }
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const fn = actions[el.dataset.act];
+  if (!fn) return;
+  const keepDefault = fn(el, e);
+  if (!keepDefault && el.tagName !== 'A') e.preventDefault();
+});
+
+function onField(e){
+  const el = e.target;
+  const isInput = e.type === 'input';
+  const val = el.value;
+  // Filtres de la base cabinets
+  if (el.dataset.filter){
+    ui.filters[el.dataset.filter] = val;
+    if (el.dataset.filter === 'q'){ if (isInput) $('#cabTable').innerHTML = cabTable(); }
+    else if (!isInput) render();
+    return;
+  }
+  // Champs du cabinet (mode appel)
+  if (el.dataset.cf){
+    const c = currentCab(); if (!c) return;
+    const k = el.dataset.cf;
+    if (el.tagName === 'SELECT' && isInput) return;
+    c[k] = k === 'externalise' ? val === '1' : ['praticiens','secretaires','priorite'].includes(k) ? (+val || 0) : val;
+    save();
+    if (['decideur','ville','email','specialite'].includes(k)) refreshRight();
+    if (!isInput && ['statut','priorite','specialite'].includes(k)){
+      const h = $('.call-id h1'); if (h) h.innerHTML = `${esc(c.nom)} ${pill(c.statut)} ${prio(c.priorite)}`;
+    }
+    return;
+  }
+  // Qualification
+  if (el.dataset.qf){
+    const c = currentCab(); if (!c) return;
+    const k = el.dataset.qf;
+    c.qualif[k] = el.type === 'number' ? (val === '' ? '' : +val) : val;
+    save();
+    if (!c.calc && !ui.calcDraft[c.id] && (ui.tab === 'calc' || ui.tab === 'script') && el.type === 'number') refreshRight();
+    return;
+  }
+  // Calculateur
+  if (el.dataset.calc){
+    const c = currentCab(); if (!c) return;
+    ui.calcDraft[c.id] = {...calcInputs(c), [el.dataset.calc]: val === '' ? '' : +val};
+    $('#calcOut').innerHTML = calcOutput(c);
+    return;
+  }
+  if (el.dataset.hyp){
+    state.settings.hyp[el.dataset.hyp] = Math.max(0, Math.min(100, +val || 0));
+    save(); const c = currentCab(); if (c && $('#calcOut')) $('#calcOut').innerHTML = calcOutput(c);
+    return;
+  }
+  // Paramètres
+  if (el.dataset.set){
+    const k = el.dataset.set;
+    state.settings[k] = ['prix','objAppels','objDemos'].includes(k) ? Math.max(0, +val || 0) : val;
+    save(); const c = currentCab(); if (c && $('#calcOut')) $('#calcOut').innerHTML = calcOutput(c);
+    return;
+  }
+  // Édition du script et des objections
+  if (el.dataset.sf){ state.script.steps[+el.dataset.step][el.dataset.sf] = val; save(); return; }
+  if (el.dataset.vp != null){ state.script.valueProps[el.dataset.vp] = val; save(); return; }
+  if (el.dataset.of){ state.objections[+el.dataset.obj][el.dataset.of] = val; save(); return; }
+  if (el.id === 'objSearch'){ ui.objQ = val; $('#objList').innerHTML = objList(scriptVars(currentCab())); return; }
+  // Pipeline sur mobile
+  if (el.dataset.move && !isInput){ const c = cab(el.dataset.move); c.statut = val; save(); toast(`${c.nom} → ${statutLabel(val)}`); render(); return; }
+  if (el.id === 'csvFile' && !isInput && el.files[0]){
+    const reader = new FileReader();
+    reader.onload = () => importCSV(String(reader.result));
+    reader.readAsText(el.files[0], 'utf-8');
+  }
+}
+document.addEventListener('input', onField);
+document.addEventListener('change', onField);
+
+document.addEventListener('submit', e => {
+  if (e.target.id === 'nextForm'){
+    e.preventDefault();
+    const c = currentCab();
+    c.next = {type: $('#nextType .on').dataset.k, date: $('#n_date').value, time: $('#n_time').value, note: $('#n_note').value.trim()};
+    save(); toast('Prochaine action enregistrée'); render();
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape'){
+    if (isModalOpen()) closeModal();
+    else if ($('#drawer').innerHTML) $('#drawer').innerHTML = '';
+    return;
+  }
+  if (isModalOpen()){
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && $('#resForm')){ e.preventDefault(); commitResult(true); }
+    return;
+  }
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (['input','textarea','select'].includes(tag) || e.ctrlKey || e.metaKey || e.altKey) return;
+  const c = currentCab(); if (!c) return;
+  const r = RESULTATS.find(x => x.key === e.key);
+  if (r){ e.preventDefault(); openResult(c, r.k); return; }
+  if (e.key === 'd' || e.key === 'D'){ e.preventDefault(); actions.timer(); }
+});
+
+document.addEventListener('mouseover', e => { const el = e.target.closest('[data-tip]'); if (el) showTip(el, e); });
+document.addEventListener('mousemove', e => { if (e.target.closest('[data-tip]')) moveTip(e); });
+document.addEventListener('mouseout', e => { const el = e.target.closest('[data-tip]'); if (el && !el.contains(e.relatedTarget)) hideTip(); });
+
+window.addEventListener('hashchange', () => { closeModal(); render(); });
+window.addEventListener('storage', e => { if (e.key === STORE_KEY && e.newValue){ load(); render(); } });
+
+/* ==========================================================================
+   Démarrage
+   ========================================================================== */
+try { applyTheme(localStorage.getItem(THEME_KEY)); } catch (e) {}
+load();
+render();
+</script>
+</body>
+</html>
