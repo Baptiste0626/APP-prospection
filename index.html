@@ -462,6 +462,103 @@ details.hyp summary{cursor:pointer;color:var(--text-2);font-size:12.5px;margin-t
   .phone-big{font-size:19px}
 }
 </style>
+<style>
+/* ==========================================================================
+   Pages « Démo secrétariat IA » et « Dashboard cabinet » (préfixe cab-)
+   ========================================================================== */
+.cab-demo{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+.cab-chat{
+  height:calc(100vh - 170px);min-height:520px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface);box-shadow:var(--shadow);
+  --chat--font-family:inherit;
+  --chat--color--primary:var(--accent);--chat--color--primary-shade-50:var(--accent-hover);--chat--color--primary--shade-100:var(--accent-hover);
+  --chat--color--secondary:var(--accent);--chat--color-secondary-shade-50:var(--accent-hover);
+  --chat--color-white:var(--surface);--chat--color-light:var(--surface-2);--chat--color-light-shade-50:var(--surface-3);--chat--color-light-shade-100:var(--border-strong);
+  --chat--color-medium:var(--border-strong);--chat--color-dark:var(--text);--chat--color-disabled:var(--text-3);--chat--color-typing:var(--text-3);
+  --chat--border-radius:var(--radius-sm);--chat--message--border-radius:12px;--chat--message--font-size:14px;--chat--message-line-height:1.55;
+  --chat--header--background:var(--surface);--chat--header--color:var(--text);--chat--header--border-bottom:1px solid var(--border);--chat--header--padding:16px 20px;
+  --chat--heading--font-size:17px;--chat--subtitle--font-size:12.5px;
+  --chat--body--background:var(--bg);--chat--footer--background:var(--surface);--chat--footer--color:var(--text-3);
+  --chat--message--bot--background:var(--surface);--chat--message--bot--color:var(--text);--chat--message--bot--border:1px solid var(--border);
+  --chat--message--user--background:var(--accent);--chat--message--user--color:#fff;--chat--message--user--border:none;
+  --chat--input--background:var(--surface);--chat--input--text-color:var(--text);--chat--input--border:1px solid var(--border-strong);--chat--input--border-active:1px solid var(--accent);
+  --chat--input--container--background:var(--surface);--chat--input--send--button--color:var(--accent);--chat--input--send--button--color-hover:var(--accent-hover);
+  --chat--input--send--button--background:transparent;--chat--input--send--button--background-hover:transparent;
+}
+.cab-chat > div,.cab-chat #n8n-chat{height:100%}
+.cab-chat .chat-header{gap:2px;height:auto}
+.cab-chat .chat-header h1,.cab-chat .chat-header p{margin:0}
+.cab-chat .chat-header p{color:var(--text-3)}
+.cab-chat-msg{height:100%;display:grid;place-items:center;text-align:center;color:var(--text-3);padding:24px}
+.cab-side{display:flex;flex-direction:column;gap:16px;position:sticky;top:16px}
+.cab-ex{display:flex;flex-direction:column;gap:8px}
+.cab-ex button{
+  display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;border:1px solid var(--border);background:var(--surface);
+  border-radius:var(--radius-sm);padding:10px 12px;cursor:pointer;font-size:13.5px;line-height:1.4;color:var(--text);transition:border-color .12s,background .12s;
+}
+.cab-ex button:hover{border-color:var(--accent);background:var(--accent-soft)}
+.cab-ex button svg{width:15px;height:15px;flex:none;margin-top:2px;color:var(--text-3)}
+.cab-ex button .t{flex:1}
+.cab-ex button .k{font-size:11.5px;color:var(--text-3);display:block;margin-top:2px}
+.cab-kpi{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px}
+.cab-kpi .card.alert{background:var(--c-red-bg);border-color:var(--c-red)}
+.cab-kpi .card.alert .kpi-label,.cab-kpi .card.alert .kpi-value,.cab-kpi .card.alert .kpi-sub{color:var(--c-red)}
+.cab-block{margin-bottom:16px}
+.cab-block.urg{border-color:var(--c-red);box-shadow:inset 3px 0 0 var(--c-red)}
+.cab-urg{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--border);flex-wrap:wrap}
+.cab-urg:first-child{border-top:0;padding-top:2px}
+.cab-urg .m{flex:1 1 260px;min-width:0}
+.cab-urg .n{font-weight:600;font-size:14.5px}
+.cab-urg .d{margin-top:3px;white-space:pre-wrap;word-break:break-word}
+.cab-tel{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.cab-tel svg{width:14px;height:14px}
+select.input.cab-sel{width:auto;min-width:122px;height:30px;font-size:12.5px;font-weight:500}
+.cab-sel[data-s="a"]{color:var(--c-red);border-color:var(--c-red)}
+.cab-sel[data-s="c"]{color:var(--c-violet)}
+.cab-sel[data-s="t"]{color:var(--c-green)}
+.cab-sel:disabled{opacity:.6}
+.cab-day{font-size:12px;font-weight:600;color:var(--text-2);margin:14px 0 6px;text-transform:capitalize}
+.cab-day:first-child{margin-top:0}
+.cab-rdv{display:flex;gap:12px;align-items:center;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px;background:var(--surface)}
+.cab-rdv .h{width:96px;flex:none;font-weight:600;font-variant-numeric:tabular-nums;font-size:13px}
+.cab-rdv .m{flex:1;min-width:0}
+.cab-rdv .m b{font-weight:500;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cab-rdv .m span{font-size:12.5px;color:var(--text-2);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cab-rdv.past{opacity:.6}
+.cab-past summary{cursor:pointer;color:var(--text-2);font-size:12.5px;margin-top:10px}
+.cab-table td{vertical-align:top}
+.cab-table tbody tr{cursor:default}
+.cab-table td.det{white-space:normal;min-width:200px;max-width:360px;word-break:break-word}
+.cab-empty{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--text-3);padding:22px 0;text-align:center;font-size:13px}
+.cab-empty svg{width:22px;height:22px;color:var(--c-green)}
+.cab-err{display:flex;gap:12px;align-items:flex-start;background:var(--c-red-bg);color:var(--c-red);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px}
+.cab-err svg{width:18px;height:18px;flex:none;margin-top:2px}
+.cab-err .m{flex:1}
+.cab-login{max-width:400px;margin:8vh auto 0}
+.cab-login .auto-ic{margin-bottom:12px}
+.cab-spin{width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;display:inline-block;animation:cabspin .7s linear infinite}
+@keyframes cabspin{to{transform:rotate(360deg)}}
+.cab-skel{height:86px;border-radius:var(--radius);background:linear-gradient(90deg,var(--surface-2),var(--surface-3),var(--surface-2));background-size:200% 100%;animation:cabsk 1.2s infinite}
+@keyframes cabsk{to{background-position:-200% 0}}
+@media (max-width:1100px){
+  .cab-demo{grid-template-columns:minmax(0,1fr)}
+  .cab-side{position:static;order:-1}
+  .cab-ex{flex-direction:row;overflow-x:auto;padding-bottom:4px}
+  .cab-ex button{flex:0 0 220px}
+}
+@media (max-width:860px){
+  .cab-chat{height:calc(100vh - 300px);height:calc(100dvh - 300px);min-height:420px}
+  .cab-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cab-rdv .h{width:74px}
+  .cab-table thead{display:none}
+  .cab-table,.cab-table tbody,.cab-table tr,.cab-table td{display:block;width:100%}
+  .cab-table tr{padding:10px 14px;border-bottom:1px solid var(--border)}
+  .cab-table tbody tr:last-child{border-bottom:0}
+  .cab-table td{border:0;padding:2px 0;white-space:normal}
+  .cab-table td.det{max-width:none;min-width:0}
+  .cab-table td[data-l]::before{content:attr(data-l) " : ";color:var(--text-3);font-size:12px}
+  .cab-table td.st{padding-top:8px}
+}
+</style>
 </head>
 <body>
 <div class="app">
@@ -1295,6 +1392,8 @@ const NAV = [
   {r:'activite', l:'Activité et pilotage', i:'chart', roles:['gerant']},
   {r:'automatisations', l:'Automatisations', i:'zap', roles:['gerant']},
   {r:'parametres', l:'Équipe et paramètres', i:'gear', roles:['gerant']},
+  {r:'demo-secretariat', l:'Démo secrétariat IA', i:'msg', roles:ALL},
+  {r:'dashboard-cabinet', l:'Dashboard cabinet', i:'shield', roles:ALL},
 ];
 const allowed = r => { const n = NAV.find(x => x.r === r); return r === 'patient' || !n || n.roles.includes(role()); };
 
@@ -1351,7 +1450,8 @@ function render(){
   hideTip();
   const views = {'':viewDashboard, agenda:viewAgenda, patients:viewPatients, patient:() => viewPatient(arg), secretariat:viewSecretariat,
     demandes:viewDemandes, 'comptes-rendus':viewCR, documents:viewDocuments, rappels:viewRappels, taches:viewTaches,
-    modeles:viewModeles, activite:viewActivite, automatisations:viewAutomations, parametres:viewSettings};
+    modeles:viewModeles, activite:viewActivite, automatisations:viewAutomations, parametres:viewSettings,
+    'demo-secretariat':viewDemoAgent, 'dashboard-cabinet':viewDashboardCabinet};
   $('#view').innerHTML = (views[name] || viewDashboard)();
   if (name === 'taches') bindKanban();
   window.scrollTo(0, 0);
@@ -2747,6 +2847,361 @@ function toggleTheme(){
   try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
   renderShell();
 }
+</script>
+<script>
+/* ==========================================================================
+   Pages « Démo secrétariat IA » et « Dashboard cabinet » (agent n8n)
+   - Démo : chat n8n chargé à la demande, initialisé une seule fois.
+   - Dashboard : données patients lues uniquement via /api/cabinet/* (clé n8n côté serveur,
+     accès protégé par mot de passe et cookie HttpOnly). Aucun appel direct à n8n ici.
+   ========================================================================== */
+const CAB_CHAT_VERSION = '1.44.4';
+const CAB_CHAT_CDN = `https://cdn.jsdelivr.net/npm/@n8n/chat@${CAB_CHAT_VERSION}/dist/`;
+const CAB_CHAT_FALLBACK_URL = 'https://baptisteee.app.n8n.cloud/webhook/0ab2140a-5a41-4b55-b105-4fc507b2c4e9/chat';
+const CAB_EXEMPLES = [
+  {t:'Vous avez de la place demain matin ?', k:'Prise de rendez-vous'},
+  {t:'Vous acceptez la carte Vitale ?', k:'Information pratique'},
+  {t:'J’ai besoin d’un renouvellement d’ordonnance', k:'Demande administrative'},
+  {t:'J’ai très mal à une dent, ma joue a gonflé', k:'Urgence'},
+];
+const CAB_STATUTS = ['À traiter', 'En cours', 'Traité'];
+const CAB_RESET_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>';
+const CAB_TZ = 'Europe/Paris';
+
+/* ---------- Démo secrétariat IA ---------- */
+const cabChat = {host:null, app:null, createChat:null, loading:null, error:''};
+
+function viewDemoAgent(){
+  queueMicrotask(cabMountChat);
+  return `<div class="page">
+    <div class="page-head">
+      <div><h1>Démo secrétariat IA</h1><p>L’assistant virtuel répond aux patients 24h/24 : rendez-vous, informations pratiques, demandes administratives et urgences.</p></div>
+      <div class="btn-row"><button class="btn" data-cab="resetChat">${CAB_RESET_ICON} Réinitialiser la conversation</button></div>
+    </div>
+    <div class="cab-demo">
+      <div class="cab-chat" id="cabChatSlot"></div>
+      <aside class="cab-side">
+        <div class="card">
+          <div class="card-head" style="margin-bottom:10px"><h2>Exemples à tester</h2></div>
+          <div class="cab-ex">${CAB_EXEMPLES.map((x, i) => `<button type="button" data-cab="copyEx" data-i="${i}" title="Copier ce message">${icon('copy')}<span class="t">${esc(x.t)}<span class="k">${esc(x.k)}</span></span></button>`).join('')}</div>
+          <p class="small faint" style="margin:10px 0 0">Cliquez pour copier le message (il est aussi placé dans la zone de saisie du chat).</p>
+        </div>
+        <div class="card hide-sm">
+          <div class="note-ia" style="margin-top:0;align-items:flex-start">${icon('shield')}<span>Démonstration : n’indiquez pas de vraies données de santé. L’assistant ne pose aucun diagnostic et oriente les urgences vers l’équipe ou le 15.</span></div>
+        </div>
+      </aside>
+    </div>
+  </div>`;
+}
+
+async function cabChatUrl(){
+  try {
+    const r = await fetch('/api/cabinet/config', {cache:'no-store'});
+    if (r.ok){ const j = await r.json(); if (j.chatUrl) return j.chatUrl; }
+  } catch (e) {}
+  return CAB_CHAT_FALLBACK_URL;
+}
+function cabLoadChatLib(){
+  if (cabChat.loading) return cabChat.loading;
+  if (!document.querySelector('link[data-n8n-chat-css]')){
+    const l = document.createElement('link');
+    l.rel = 'stylesheet'; l.href = CAB_CHAT_CDN + 'style.css'; l.dataset.n8nChatCss = '1';
+    document.head.appendChild(l);
+  }
+  cabChat.loading = import(CAB_CHAT_CDN + 'chat.bundle.es.js').then(m => { cabChat.createChat = m.createChat; });
+  cabChat.loading.catch(() => { cabChat.loading = null; });
+  return cabChat.loading;
+}
+async function cabStartChat(){
+  const url = await cabChatUrl();
+  const target = document.createElement('div');
+  target.id = 'n8n-chat';
+  cabChat.host.innerHTML = '';
+  cabChat.host.appendChild(target);
+  cabChat.app = cabChat.createChat({
+    webhookUrl: url,
+    mode: 'fullscreen',
+    target: '#n8n-chat',
+    showWelcomeScreen: false,
+    defaultLanguage: 'en',
+    initialMessages: ['Bonjour ! Je suis l’assistant virtuel du cabinet. Comment puis-je vous aider ?'],
+    i18n: { en: { title: 'Secrétariat du cabinet', subtitle: 'Assistant virtuel 24h/24', inputPlaceholder: 'Écrivez votre message…', getStarted: 'Nouvelle conversation', footer: '' } },
+  });
+}
+async function cabMountChat(){
+  const slot = document.getElementById('cabChatSlot');
+  if (!slot) return;
+  if (!cabChat.host){ cabChat.host = document.createElement('div'); cabChat.host.style.height = '100%'; }
+  slot.appendChild(cabChat.host); // le chat survit aux re-rendus : on déplace le même nœud
+  if (cabChat.app) return;
+  if (!cabChat.host.childElementCount) cabChat.host.innerHTML = `<div class="cab-chat-msg"><span><span class="cab-spin"></span>&nbsp; Chargement de l’assistant…</span></div>`;
+  try {
+    await cabLoadChatLib();
+    if (!cabChat.app && document.body.contains(cabChat.host)) await cabStartChat();
+  } catch (e){
+    cabChat.host.innerHTML = `<div class="cab-chat-msg"><div>Impossible de charger l’assistant.<br><span class="small">Vérifiez votre connexion internet puis rechargez la page.</span><br><br><button class="btn sm" data-cab="retryChat">Réessayer</button></div></div>`;
+  }
+}
+async function cabResetChat(){
+  try { localStorage.removeItem('n8n-chat/sessionId'); } catch (e) {}
+  if (cabChat.app){ try { cabChat.app.unmount(); } catch (e) {} cabChat.app = null; }
+  if (!cabChat.createChat){ cabMountChat(); return; }
+  await cabStartChat();
+  toast('Nouvelle conversation');
+}
+function cabCopyExample(i){
+  const txt = CAB_EXEMPLES[i].t;
+  const ta = cabChat.host && cabChat.host.querySelector('textarea');
+  if (ta){ ta.value = txt; ta.dispatchEvent(new Event('input', {bubbles:true})); ta.focus(); }
+  const done = () => toast(ta ? 'Message copié et placé dans le chat' : 'Message copié');
+  (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(done, () => toast(ta ? 'Message placé dans le chat' : 'Copie impossible dans ce navigateur'));
+}
+
+/* ---------- Dashboard cabinet ---------- */
+const cab = {auth:'unknown', data:null, loading:false, error:'', errorCode:'', last:null, timer:null, pending:0, fType:'', fStatut:'', loginError:'', loginBusy:false};
+
+const cabFmt = (d, o) => new Intl.DateTimeFormat('fr-FR', {timeZone:CAB_TZ, ...o}).format(d);
+const cabDayKey = d => new Intl.DateTimeFormat('en-CA', {timeZone:CAB_TZ, year:'numeric', month:'2-digit', day:'2-digit'}).format(d);
+const cabTime = d => cabFmt(d, {hour:'2-digit', minute:'2-digit'}).replace(':', 'h');
+function cabDayLabel(d){
+  const k = cabDayKey(d), now = new Date();
+  if (k === cabDayKey(now)) return 'Aujourd’hui · ' + cabFmt(d, {weekday:'long', day:'numeric', month:'long'});
+  if (k === cabDayKey(new Date(now.getTime() + 86400000))) return 'Demain · ' + cabFmt(d, {weekday:'long', day:'numeric', month:'long'});
+  if (k === cabDayKey(new Date(now.getTime() - 86400000))) return 'Hier · ' + cabFmt(d, {weekday:'long', day:'numeric', month:'long'});
+  return cabFmt(d, {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+}
+const cabStatutKey = s => { const n = norm(s); return n.startsWith('a traiter') ? 'a' : n.startsWith('en cours') ? 'c' : n.startsWith('traite') ? 't' : ''; };
+const cabCanon = s => ({a:'À traiter', c:'En cours', t:'Traité'})[cabStatutKey(s)] || String(s || '');
+const cabParseFr = s => { const m = String(s || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\D+(\d{1,2})[:h](\d{2}))?/); return m ? Date.UTC(+m[3], m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0)) : 0; };
+const cabTelHref = t => 'tel:' + String(t || '').replace(/[^\d+]/g, '');
+const cabList = k => Array.isArray(cab.data && cab.data[k]) ? cab.data[k] : [];
+
+function viewDashboardCabinet(){
+  queueMicrotask(cabEnter);
+  return `<div class="page" id="cabRoot">${cabInner()}</div>`;
+}
+function cabEnter(){
+  if (!document.getElementById('cabRoot')) return;
+  if (!cab.timer) cab.timer = setInterval(() => { if (route().name === 'dashboard-cabinet' && cab.auth === 'ok' && !cab.pending && !document.hidden) cabLoad(true); }, 60000);
+  if (cab.auth !== 'need' && !cab.loading && (!cab.last || Date.now() - cab.last > 20000)) cabLoad(!!cab.data);
+}
+function cabLeave(){ if (route().name !== 'dashboard-cabinet' && cab.timer){ clearInterval(cab.timer); cab.timer = null; } }
+window.addEventListener('hashchange', cabLeave);
+
+function cabPaint(){ const root = document.getElementById('cabRoot'); if (root) root.innerHTML = cabInner(); }
+
+async function cabApi(path, opts){
+  let r, j = {};
+  try { r = await fetch(path, {cache:'no-store', credentials:'same-origin', ...opts}); }
+  catch (e){ return {ok:false, status:0, error:'Serveur injoignable : vérifiez votre connexion internet.'}; }
+  try { j = await r.json(); } catch (e) {}
+  if (!r.ok) return {ok:false, status:r.status, code:j.code, error:j.error || (r.status === 404 ? 'Route API introuvable : ce dashboard doit être ouvert depuis le site déployé sur Vercel.' : `Erreur serveur (HTTP ${r.status}).`)};
+  return {ok:true, status:r.status, data:j};
+}
+
+async function cabLoad(silent){
+  if (cab.loading) return;
+  cab.loading = true;
+  if (!silent) cabPaint(); else cabPaintHead();
+  const res = await cabApi('/api/cabinet/dashboard');
+  cab.loading = false;
+  if (res.ok){
+    cab.auth = 'ok'; cab.data = res.data; cab.error = ''; cab.errorCode = ''; cab.last = Date.now();
+  } else if (res.status === 401){
+    cab.auth = 'need'; cab.data = null; cab.error = '';
+  } else {
+    cab.error = res.error; cab.errorCode = res.code || '';
+    if (res.code === 'auth_not_configured') cab.auth = 'unknown';
+  }
+  cabPaint();
+}
+function cabPaintHead(){ const h = document.getElementById('cabHead'); if (h) h.outerHTML = cabHead(); }
+
+function cabHead(){
+  const last = cab.last ? cabFmt(new Date(cab.last), {hour:'2-digit', minute:'2-digit', second:'2-digit'}) : '—';
+  const gen = cab.data && cab.data.genere_le ? ` · données générées ${cabFmt(new Date(cab.data.genere_le), {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}` : '';
+  return `<div class="page-head" id="cabHead">
+    <div><h1>Dashboard cabinet</h1><p>Activité de l’assistant IA en temps réel · Dernière mise à jour : <span class="num">${last}</span>${esc(gen)}</p></div>
+    <div class="btn-row">
+      <button class="btn" data-cab="refresh" ${cab.loading ? 'disabled' : ''}>${cab.loading ? '<span class="cab-spin"></span>' : icon('clock')} Actualiser</button>
+      <button class="btn ghost" data-cab="logout">Se déconnecter</button>
+    </div></div>`;
+}
+
+function cabInner(){
+  if (cab.auth === 'need') return cabLogin();
+  if (cab.errorCode === 'auth_not_configured' || (!cab.data && cab.error)) {
+    return `<div class="page-head"><div><h1>Dashboard cabinet</h1><p>Activité de l’assistant IA en temps réel</p></div></div>
+      <div class="cab-err">${icon('alert')}<div class="m"><b>Impossible d’afficher le dashboard</b><div class="small" style="margin-top:3px">${esc(cab.error)}</div></div>
+      <button class="btn sm" data-cab="refresh">Réessayer</button></div>`;
+  }
+  if (!cab.data){
+    return `<div class="page-head"><div><h1>Dashboard cabinet</h1><p>Chargement des données…</p></div></div>
+      <div class="grid cab-kpi">${'<div class="cab-skel"></div>'.repeat(4)}</div><div class="cab-skel" style="height:180px"></div>`;
+  }
+  const st = cab.data.stats || {};
+  const urg = cabList('urgences'), dem = cabList('demandes'), rdv = cabList('rdv');
+  const nUrg = Number(st.urgences_a_traiter) || 0;
+  const kpis = [
+    ['RDV à venir', st.rdv_a_venir, 'dans l’agenda'],
+    ['RDV pris par l’IA', st.rdv_pris_par_ia, 'via l’assistant virtuel'],
+    ['Demandes à traiter', st.demandes_a_traiter, 'ordonnances, documents…'],
+    ['Urgences à traiter', st.urgences_a_traiter, nUrg > 0 ? 'à rappeler en priorité' : 'aucune en attente', nUrg > 0],
+  ];
+  return `${cabHead()}
+    ${cab.error ? `<div class="cab-err">${icon('alert')}<div class="m"><b>Actualisation impossible</b> — les données affichées datent de la dernière mise à jour réussie.<div class="small" style="margin-top:3px">${esc(cab.error)}</div></div><button class="btn sm" data-cab="refresh">Réessayer</button></div>` : ''}
+    <div class="grid cab-kpi">${kpis.map(([l, v, s, alert]) => `<div class="card ${alert ? 'alert' : ''}"><div class="kpi-label">${l}</div><div class="kpi-value">${fmtNum(Number(v) || 0)}</div><div class="kpi-sub">${s}</div></div>`).join('')}</div>
+    ${cabUrgences(urg)}
+    <div class="cab-block">${cabRdv(rdv)}</div>
+    <div class="cab-block">${cabDemandes(dem)}</div>`;
+}
+
+function cabLogin(){
+  return `<div class="cab-login card">
+    <div class="auto-ic">${icon('shield')}</div>
+    <h1 style="font-size:19px">Dashboard cabinet</h1>
+    <p class="muted" style="margin:4px 0 16px">Données patients : accès réservé à l’équipe du cabinet.</p>
+    <form id="cabLoginForm" autocomplete="on">
+      <input type="text" name="username" value="cabinet" autocomplete="username" hidden>
+      <div class="field"><label for="cabPwd">Mot de passe</label><input class="input" type="password" id="cabPwd" name="password" autocomplete="current-password" required autofocus></div>
+      ${cab.loginError ? `<div class="small" style="color:var(--c-red);margin-top:8px">${esc(cab.loginError)}</div>` : ''}
+      <button class="btn primary" type="submit" style="width:100%;margin-top:14px" ${cab.loginBusy ? 'disabled' : ''}>${cab.loginBusy ? '<span class="cab-spin"></span>' : ''} Se connecter</button>
+    </form>
+    <p class="small faint" style="margin:12px 0 0">Session valable 12 heures sur cet appareil.</p>
+  </div>`;
+}
+
+function cabSelect(x){
+  const cur = cabCanon(x.statut);
+  const list = CAB_STATUTS.includes(cur) ? CAB_STATUTS : [cur, ...CAB_STATUTS];
+  return `<select class="input cab-sel" data-cabrow="${esc(x.row_number)}" data-s="${cabStatutKey(cur)}" aria-label="Statut de la demande de ${esc(x.nom_patient)}" ${x._busy ? 'disabled' : ''}>${list.map(s => `<option ${s === cur ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>`;
+}
+const cabEmpty = (txt, ok=true) => `<div class="cab-empty">${ok ? icon('check') : icon('inbox')}<span>${txt}</span></div>`;
+
+function cabUrgences(list){
+  const sorted = [...list].sort((a, b) => (cabStatutKey(a.statut) === 't') - (cabStatutKey(b.statut) === 't') || cabParseFr(b.date) - cabParseFr(a.date));
+  const open = list.filter(x => cabStatutKey(x.statut) !== 't').length;
+  return `<div class="card cab-block ${open ? 'urg' : ''}">
+    <div class="card-head"><h2 style="display:flex;gap:8px;align-items:center">${open ? `<span style="color:var(--c-red);display:inline-flex">${icon('alert')}</span>` : ''}Urgences</h2>${list.length ? `<span class="small faint">${plural(open, 'en attente', 'en attente')}</span>` : ''}</div>
+    ${sorted.length ? `<div class="list">${sorted.map(x => `<div class="cab-urg">
+      <div class="m">
+        <div class="n">${esc(x.nom_patient || 'Patient non renseigné')}</div>
+        <div class="small muted" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:2px">${x.telephone ? `<a class="cab-tel" href="${esc(cabTelHref(x.telephone))}">${icon('phone')}${esc(x.telephone)}</a>` : '<span>Pas de téléphone</span>'}${x.email ? `<a href="mailto:${esc(x.email)}">${esc(x.email)}</a>` : ''}<span class="faint">${esc(x.date || '')}</span></div>
+        ${x.details ? `<div class="d">${esc(x.details)}</div>` : ''}
+      </div>
+      ${cabSelect(x)}</div>`).join('')}</div>` : cabEmpty('Aucune urgence signalée par l’assistant.')}
+  </div>`;
+}
+
+function cabRdvItem(r, past){
+  const d = new Date(r.debut), f = r.fin ? new Date(r.fin) : null;
+  const titre = String(r.titre || 'Rendez-vous').replace(/^RDV\s*[-–:]\s*/i, '');
+  return `<div class="cab-rdv ${past ? 'past' : ''}"><span class="h">${isNaN(d) ? '—' : cabTime(d)}${f && !isNaN(f) ? `<span class="faint" style="font-weight:400"> – ${cabTime(f)}</span>` : ''}</span>
+    <div class="m"><b>${esc(titre)}</b>${r.description ? `<span title="${esc(r.description)}">${esc(r.description)}</span>` : ''}</div>
+    ${r.pris_par_ia ? aiBadge('Rendez-vous pris par l’assistant IA') : ''}</div>`;
+}
+function cabRdvGroups(list, past){
+  let html = '', day = '';
+  for (const r of list){
+    const d = new Date(r.debut), k = isNaN(d) ? '' : cabDayKey(d);
+    if (k !== day){ day = k; html += `<div class="cab-day">${k ? esc(cabDayLabel(d)) : 'Date inconnue'}</div>`; }
+    html += cabRdvItem(r, past);
+  }
+  return html;
+}
+function cabRdv(list){
+  const now = Date.now();
+  const t = r => { const v = new Date(r.debut).getTime(); return isNaN(v) ? Infinity : v; };
+  const end = r => { const v = new Date(r.fin || r.debut).getTime(); return isNaN(v) ? Infinity : v; };
+  const upcoming = list.filter(r => end(r) >= now).sort((a, b) => t(a) - t(b));
+  const past = list.filter(r => end(r) < now).sort((a, b) => t(b) - t(a));
+  return `<div class="card">
+    <div class="card-head"><h2>Prochains rendez-vous</h2><span class="small faint">${plural(upcoming.length, 'à venir', 'à venir')}</span></div>
+    ${upcoming.length ? cabRdvGroups(upcoming, false) : cabEmpty('Aucun rendez-vous à venir.', false)}
+    ${past.length ? `<details class="cab-past"><summary>Rendez-vous passés (${past.length})</summary><div style="margin-top:10px">${cabRdvGroups(past, true)}</div></details>` : ''}
+  </div>`;
+}
+
+function cabDemandes(list){
+  const types = [...new Set(list.map(x => x.type_demande).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr'));
+  if (cab.fType && !types.includes(cab.fType)) cab.fType = '';
+  const rows = list.filter(x => (!cab.fType || x.type_demande === cab.fType) && (!cab.fStatut || cabCanon(x.statut) === cab.fStatut))
+    .sort((a, b) => (cabStatutKey(a.statut) === 't') - (cabStatutKey(b.statut) === 't') || cabParseFr(b.date) - cabParseFr(a.date));
+  const label = s => String(s || '').replace(/^./, c => c.toUpperCase());
+  return `<div class="card">
+    <div class="card-head"><h2>Demandes administratives</h2><span class="small faint">${plural(rows.length, 'demande')}</span></div>
+    ${list.length ? `<div class="toolbar">
+      <select class="input" data-cabfilter="fType" aria-label="Filtrer par type"><option value="">Tous les types</option>${types.map(x => `<option value="${esc(x)}" ${x === cab.fType ? 'selected' : ''}>${esc(label(x))}</option>`).join('')}</select>
+      <select class="input" data-cabfilter="fStatut" aria-label="Filtrer par statut"><option value="">Tous les statuts</option>${CAB_STATUTS.map(x => `<option ${x === cab.fStatut ? 'selected' : ''}>${x}</option>`).join('')}</select>
+      ${cab.fType || cab.fStatut ? `<button class="btn ghost sm" data-cab="clearFilters">Effacer</button>` : ''}
+    </div>
+    ${rows.length ? `<div class="table-wrap"><table class="cab-table"><thead><tr><th>Date</th><th>Type</th><th>Patient</th><th>Détails</th><th>Statut</th></tr></thead><tbody>
+      ${rows.map(x => `<tr>
+        <td data-l="Date" class="num small">${esc(x.date || '—')}</td>
+        <td data-l="Type">${tagc(label(x.type_demande || 'autre'), 'violet')}</td>
+        <td><div class="cab-name" style="font-weight:500">${esc(x.nom_patient || '—')}</div>${x.telephone ? `<a class="cab-tel small" href="${esc(cabTelHref(x.telephone))}">${esc(x.telephone)}</a>` : ''}${x.email ? `<div class="small"><a href="mailto:${esc(x.email)}">${esc(x.email)}</a></div>` : ''}</td>
+        <td class="det small">${esc(x.details || '—')}</td>
+        <td class="st">${cabSelect(x)}</td></tr>`).join('')}
+    </tbody></table></div>` : cabEmpty('Aucune demande ne correspond à ces filtres.', false)}`
+    : cabEmpty('Aucune demande administrative en attente.')}
+  </div>`;
+}
+
+/* Mise à jour optimiste du statut, avec retour arrière en cas d’erreur */
+async function cabSetStatut(row, statut){
+  const item = [...cabList('urgences'), ...cabList('demandes')].find(x => String(x.row_number) === String(row));
+  if (!item || cabCanon(item.statut) === statut) return;
+  const prev = item.statut, wasTodo = cabStatutKey(prev) === 'a', isTodo = statut === 'À traiter';
+  const statKey = cabList('urgences').includes(item) ? 'urgences_a_traiter' : 'demandes_a_traiter';
+  const st = cab.data.stats || (cab.data.stats = {});
+  const delta = (isTodo ? 1 : 0) - (wasTodo ? 1 : 0);
+  item.statut = statut; item._busy = true; st[statKey] = Math.max(0, (Number(st[statKey]) || 0) + delta);
+  cab.pending++; cabPaint();
+  const res = await cabApi('/api/cabinet/statut', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({row_number: Number(row), statut})});
+  cab.pending--; item._busy = false;
+  if (res.ok){ toast(`Statut mis à jour : ${statut}`); }
+  else {
+    item.statut = prev; st[statKey] = Math.max(0, (Number(st[statKey]) || 0) - delta);
+    if (res.status === 401){ cab.auth = 'need'; cab.data = null; }
+    toast(`Échec de la mise à jour : ${res.error}`);
+  }
+  cabPaint();
+}
+
+async function cabLoginSubmit(form){
+  const pwd = form.password.value;
+  cab.loginBusy = true; cab.loginError = ''; cabPaint();
+  const res = await cabApi('/api/cabinet/login', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({password: pwd})});
+  cab.loginBusy = false;
+  if (res.ok){ cab.auth = 'ok'; cab.last = null; cabLoad(false); return; }
+  if (res.code === 'auth_not_configured'){ cab.auth = 'unknown'; cab.error = res.error; cab.errorCode = res.code; cabPaint(); return; }
+  cab.loginError = res.error; cabPaint();
+  const p = document.getElementById('cabPwd'); if (p) p.focus();
+}
+
+/* ---------- Événements propres à ces deux pages (attributs data-cab*, sans toucher aux gestionnaires existants) ---------- */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-cab]');
+  if (!el) return;
+  e.preventDefault();
+  const a = el.dataset.cab;
+  if (a === 'copyEx') cabCopyExample(+el.dataset.i);
+  else if (a === 'resetChat') cabResetChat();
+  else if (a === 'retryChat'){ cabChat.host.innerHTML = ''; cabMountChat(); }
+  else if (a === 'refresh'){ cab.error = ''; cabLoad(!!cab.data); }
+  else if (a === 'clearFilters'){ cab.fType = ''; cab.fStatut = ''; cabPaint(); }
+  else if (a === 'logout'){
+    cabApi('/api/cabinet/logout', {method:'POST'}).then(() => { cab.auth = 'need'; cab.data = null; cab.last = null; cab.error = ''; cabPaint(); toast('Déconnecté'); });
+  }
+});
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.dataset && el.dataset.cabrow) cabSetStatut(el.dataset.cabrow, el.value);
+  else if (el.dataset && el.dataset.cabfilter){ cab[el.dataset.cabfilter] = el.value; cabPaint(); }
+});
+document.addEventListener('submit', e => {
+  if (e.target.id === 'cabLoginForm'){ e.preventDefault(); cabLoginSubmit(e.target); }
+});
 </script>
 <script>
 /* ==========================================================================
